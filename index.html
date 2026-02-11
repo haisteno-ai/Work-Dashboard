@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMMAND // DASHBOARD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080c10;
+    --panel:     #0b1118;
+    --border:    #1a2a38;
+    --accent:    #00d4ff;
+    --accent2:   #ff6b35;
+    --accent3:   #39ff14;
+    --dim:       #2a3d4f;
+    --text:      #c8dde8;
+    --muted:     #4a6478;
+    --glow:      0 0 12px rgba(0,212,255,0.35);
+    --glow2:     0 0 12px rgba(255,107,53,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Grid noise texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.4;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, rgba(0,212,255,0.04) 0%, transparent 60%);
+    position: relative;
+  }
+  #header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.5;
+  }
+  .logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 6px;
+    text-shadow: var(--glow);
+  }
+  .logo span { color: var(--muted); font-size: 13px; letter-spacing: 2px; display: block; margin-top: 2px; }
+  #clock-display {
+    text-align: right;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  #clock-time {
+    font-size: 32px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    line-height: 1;
+  }
+  #clock-date { font-size: 12px; color: var(--muted); letter-spacing: 2px; margin-top: 4px; }
+
+  /* ── MAIN GRID ───────────────────────────── */
+  #grid {
+    display: grid;
+    grid-template-columns: 300px 1fr 1fr 280px;
+    grid-template-rows: auto auto auto;
+    gap: 12px;
+    padding: 12px 16px 20px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  /* ── PANEL BASE ──────────────────────────── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .panel:hover { border-color: var(--dim); }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .panel:hover::before { opacity: 0.5; }
+
+  .panel-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.03);
+  }
+  .panel-header .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: var(--glow);
+    animation: pulse 2s infinite;
+  }
+  .panel-header .dot.orange { background: var(--accent2); box-shadow: var(--glow2); }
+  .panel-header .dot.green { background: var(--accent3); }
+  .panel-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .panel-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+  .panel-body { padding: 14px; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── WEATHER ─────────────────────────────── */
+  #weather { grid-column: 1; grid-row: 1 / 3; }
+  #weather-setup { padding: 14px; }
+  #weather-setup p { color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.6; }
+  .input-row { display: flex; gap: 6px; margin-bottom: 8px; }
+  .dash-input {
+    flex: 1;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--dim);
+    color: var(--text);
+    padding: 7px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .dash-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,212,255,0.1); }
+  .dash-btn {
+    background: rgba(0,212,255,0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 7px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+  .dash-btn:hover { background: rgba(0,212,255,0.2); box-shadow: var(--glow); }
+
+  #weather-data { padding: 14px; display: none; }
+  .weather-main { text-align: center; padding: 10px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .weather-temp { font-size: 58px; font-weight: 300; color: var(--accent); line-height: 1; text-shadow: var(--glow); }
+  .weather-temp sup { font-size: 22px; vertical-align: super; }
+  .weather-desc { color: var(--muted); font-size: 13px; margin-top: 6px; text-transform: uppercase; letter-spacing: 2px; }
+  .weather-city { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 4px; }
+  .weather-icon { font-size: 48px; margin-bottom: 4px; }
+  .weather-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .weather-stat {
+    background: rgba(0,212,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 10px;
+  }
+  .weather-stat-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .weather-stat-val { font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+  /* ── CRYPTO ──────────────────────────────── */
+  #crypto { grid-column: 2; grid-row: 1; }
+  .crypto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .crypto-card {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .crypto-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .crypto-card.btc::after { background: linear-gradient(90deg, #f7931a, transparent); }
+  .crypto-card.xrp::after { background: linear-gradient(90deg, #346aa9, transparent); }
+  .crypto-card.zec::after { background: linear-gradient(90deg, #ecb244, transparent); }
+  .crypto-sym { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--muted); }
+  .crypto-name { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .crypto-price { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .crypto-change {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    margin-top: 4px;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+  .crypto-change.up { color: var(--accent3); background: rgba(57,255,20,0.08); }
+  .crypto-change.down { color: #ff4444; background: rgba(255,68,68,0.08); }
+
+  /* ── STOCKS ──────────────────────────────── */
+  #stocks { grid-column: 3; grid-row: 1; }
+  .stock-list { display: flex; flex-direction: column; gap: 8px; }
+  .stock-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .stock-sym { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--accent); width: 60px; }
+  .stock-name { font-size: 12px; color: var(--muted); flex: 1; padding: 0 8px; }
+  .stock-price { font-size: 15px; font-weight: 600; color: var(--text); width: 80px; text-align: right; }
+  .stock-change {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    width: 64px;
+    text-align: right;
+  }
+  .stock-change.up { color: var(--accent3); }
+  .stock-change.down { color: #ff4444; }
+  .stocks-note { font-size: 10px; color: var(--muted); margin-top: 8px; text-align: right; }
+  .stocks-add { display: flex; gap: 6px; margin-top: 8px; }
+
+  /* ── QUOTE ───────────────────────────────── */
+  #quote-panel { grid-column: 4; grid-row: 1; }
+  #quote-body { padding: 16px; display: flex; flex-direction: column; height: 100%; justify-content: center; }
+  .quote-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    font-style: italic;
+    position: relative;
+    padding-left: 14px;
+    border-left: 2px solid var(--accent);
+  }
+  .quote-author { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 12px; letter-spacing: 1px; }
+  .quote-refresh { font-size: 11px; color: var(--dim); cursor: pointer; margin-top: 10px; text-align: right; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+  .quote-refresh:hover { color: var(--accent); }
+
+  /* ── NEWS ────────────────────────────────── */
+  #news { grid-column: 1 / 3; grid-row: 3; }
+  .news-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .news-tab {
+    padding: 8px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .news-tab:hover { color: var(--text); }
+  .news-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .news-content { display: none; padding: 12px; }
+  .news-content.active { display: block; }
+  .news-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-num { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--dim); width: 20px; flex-shrink: 0; padding-top: 2px; }
+  .news-title { font-size: 13px; color: var(--text); line-height: 1.5; cursor: pointer; }
+  .news-title:hover { color: var(--accent); }
+  .news-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .news-loading { padding: 20px; text-align: center; color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+
+  /* ── MOVIES ──────────────────────────────── */
+  #movies { grid-column: 3; grid-row: 2 / 4; }
+  #movies-setup { padding: 14px; }
+  #movies-setup p { color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.6; }
+  .movie-list { padding: 10px 14px; }
+  .movie-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .movie-item:last-child { border-bottom: none; }
+  .movie-rank { font-family: 'Share Tech Mono', monospace; font-size: 18px; color: var(--dim); width: 24px; flex-shrink: 0; line-height: 1; }
+  .movie-poster { width: 40px; height: 58px; object-fit: cover; border-radius: 2px; flex-shrink: 0; background: var(--dim); }
+  .movie-info { flex: 1; min-width: 0; }
+  .movie-title { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .movie-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .movie-score { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--accent2); }
+
+  /* ── GAMES ───────────────────────────────── */
+  #games { grid-column: 2; grid-row: 2 / 4; min-width: 0; }
+  #games-setup { padding: 14px; }
+  #games-setup p { color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.6; }
+  .game-list { padding: 8px 14px; }
+  .game-item {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .game-item:last-child { border-bottom: none; }
+  .game-rank { font-family: 'Share Tech Mono', monospace; font-size: 15px; color: var(--dim); width: 20px; flex-shrink: 0; }
+  .game-img { width: 42px; height: 42px; object-fit: cover; border-radius: 3px; flex-shrink: 0; background: var(--dim); }
+  .game-name { font-size: 13px; color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .game-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .game-score { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--accent3); margin-left: auto; flex-shrink: 0; }
+
+  /* ── BOOKS ───────────────────────────────── */
+  #books { grid-column: 4; grid-row: 2; }
+  .book-list { padding: 8px 14px; }
+  .book-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .book-item:last-child { border-bottom: none; }
+  .book-cover { width: 30px; height: 44px; object-fit: cover; border-radius: 2px; flex-shrink: 0; background: var(--dim); }
+  .book-title { font-size: 12px; color: var(--text); font-weight: 600; line-height: 1.3; }
+  .book-author { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ── NOTES ───────────────────────────────── */
+  #notes { grid-column: 4; grid-row: 3; }
+  .notes-area {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    border-radius: 3px;
+    resize: none;
+    height: 130px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+  }
+  .notes-area:focus { border-color: var(--accent); }
+  .todo-list { max-height: 140px; overflow-y: auto; margin-bottom: 8px; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-cb { accent-color: var(--accent); width: 13px; height: 13px; cursor: pointer; }
+  .todo-text { flex: 1; font-size: 12px; color: var(--text); }
+  .todo-text.done { text-decoration: line-through; color: var(--muted); }
+  .todo-del { font-size: 14px; color: var(--muted); cursor: pointer; line-height: 1; }
+  .todo-del:hover { color: #ff4444; }
+  .todo-add-row { display: flex; gap: 6px; }
+
+  /* ── STATUS BAR ──────────────────────────── */
+  #statusbar {
+    padding: 6px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 24px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    background: rgba(0,212,255,0.02);
+  }
+  .sb-item { display: flex; gap: 6px; align-items: center; }
+  .sb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  .sb-dot.orange { background: var(--accent2); }
+
+  /* ── SCROLLBAR ───────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ── LOAD ANIMATION ──────────────────────── */
+  .panel { animation: fadeIn 0.4s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #header { animation: fadeIn 0.3s ease both; }
+
+  .panel:nth-child(1) { animation-delay: 0.05s; }
+  .panel:nth-child(2) { animation-delay: 0.1s; }
+  .panel:nth-child(3) { animation-delay: 0.15s; }
+  .panel:nth-child(4) { animation-delay: 0.2s; }
+  .panel:nth-child(5) { animation-delay: 0.25s; }
+  .panel:nth-child(6) { animation-delay: 0.3s; }
+
+  /* Refresh spinners */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinning { display: inline-block; animation: spin 1s linear infinite; }
+
+  /* Error state */
+  .err-msg { color: var(--accent2); font-size: 11px; padding: 10px; font-family: 'Share Tech Mono', monospace; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════ -->
+<div id="header">
+  <div class="logo">
+    COMMAND <span>// PERSONAL DASHBOARD v2.0</span>
+  </div>
+  <div id="clock-display">
+    <div id="clock-time">00:00:00</div>
+    <div id="clock-date">---</div>
+  </div>
+</div>
+
+<!-- ══ MAIN GRID ════════════════════════════════════════════ -->
+<div id="grid">
+
+  <!-- WEATHER -->
+  <div class="panel" id="weather">
+    <div class="panel-header">
+      <div class="dot orange"></div>
+      <div class="panel-title">Atmospheric Data</div>
+      <span class="panel-tag">WX-01</span>
+    </div>
+    <div id="weather-setup">
+      <p>Enter your <strong>OpenWeatherMap</strong> API key and zip code to enable live weather. Get a free key at <em>openweathermap.org</em>.</p>
+      <div class="input-row">
+        <input class="dash-input" id="wx-key" type="password" placeholder="API Key" />
+      </div>
+      <div class="input-row">
+        <input class="dash-input" id="wx-zip" type="text" placeholder="Zip code (e.g. 35957)" value="35957" />
+        <button class="dash-btn" onclick="loadWeather()">LOAD</button>
+      </div>
+      <p style="font-size:10px;margin-top:6px;color:var(--dim)">Keys are stored in localStorage — never sent anywhere except OpenWeatherMap.</p>
+    </div>
+    <div id="weather-data"></div>
+  </div>
+
+  <!-- CRYPTO -->
+  <div class="panel" id="crypto">
+    <div class="panel-header">
+      <div class="dot green"></div>
+      <div class="panel-title">Crypto Markets</div>
+      <span class="panel-tag" id="crypto-ts"></span>
+    </div>
+    <div class="panel-body">
+      <div class="crypto-grid" id="crypto-grid">
+        <div class="news-loading">⟳ Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCKS -->
+  <div class="panel" id="stocks">
+    <div class="panel-header">
+      <div class="dot orange"></div>
+      <div class="panel-title">Market Watch</div>
+      <span class="panel-tag">EQUITIES</span>
+    </div>
+    <div class="panel-body">
+      <div class="stock-list" id="stock-list"></div>
+      <div class="stocks-note">⚠ Prices via Yahoo Finance proxy · 15min delay</div>
+      <div class="stocks-add">
+        <input class="dash-input" id="stock-input" type="text" placeholder="Add ticker (e.g. AAPL)" style="text-transform:uppercase" />
+        <button class="dash-btn" onclick="addStock()">+ ADD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="panel" id="quote-panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      <div class="panel-title">Signal</div>
+      <span class="panel-tag">DAILY</span>
+    </div>
+    <div id="quote-body">
+      <div class="quote-text" id="quote-text">Loading…</div>
+      <div class="quote-author" id="quote-author"></div>
+      <div class="quote-refresh" onclick="nextQuote()">[ NEXT SIGNAL → ]</div>
+    </div>
+  </div>
+
+  <!-- GAMES -->
+  <div class="panel" id="games">
+    <div class="panel-header">
+      <div class="dot green"></div>
+      <div class="panel-title">Top Games</div>
+      <span class="panel-tag">RAWG</span>
+    </div>
+    <div id="games-area">
+      <div id="games-setup" style="display:none">
+        <p>Enter your <strong>RAWG</strong> API key to load top-rated games. Free at <em>rawg.io/apidocs</em>.</p>
+        <div class="input-row">
+          <input class="dash-input" id="rawg-key" type="password" placeholder="RAWG API Key" />
+          <button class="dash-btn" onclick="loadGames()">LOAD</button>
+        </div>
+      </div>
+      <div class="game-list" id="game-list"><div class="news-loading">⟳ Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- MOVIES -->
+  <div class="panel" id="movies">
+    <div class="panel-header">
+      <div class="dot orange"></div>
+      <div class="panel-title">Now Trending</div>
+      <span class="panel-tag">TMDB</span>
+    </div>
+    <div id="movies-area">
+      <div id="movies-setup" style="display:none">
+        <p>Enter your <strong>TMDB</strong> API key for trending movies. Free at <em>themoviedb.org/settings/api</em>.</p>
+        <div class="input-row">
+          <input class="dash-input" id="tmdb-key" type="password" placeholder="TMDB API Key" />
+          <button class="dash-btn" onclick="loadMovies()">LOAD</button>
+        </div>
+      </div>
+      <div class="movie-list" id="movie-list"><div class="news-loading">⟳ Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="panel" id="news">
+    <div class="panel-header">
+      <div class="dot"></div>
+      <div class="panel-title">Intelligence Feed</div>
+      <span class="panel-tag">LIVE</span>
+    </div>
+    <div class="news-tabs">
+      <button class="news-tab active" onclick="switchTab('world')">🌐 World</button>
+      <button class="news-tab" onclick="switchTab('us')">🇺🇸 US</button>
+      <button class="news-tab" onclick="switchTab('alabama')">📍 Alabama</button>
+      <button class="news-tab" onclick="switchTab('local')">🏘 Jacksonville</button>
+      <button class="news-tab" onclick="switchTab('tech')">💻 Tech</button>
+      <button class="news-tab" onclick="switchTab('entertainment')">🎬 Entertainment</button>
+    </div>
+    <div id="news-panels"></div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="panel" id="books">
+    <div class="panel-header">
+      <div class="dot"></div>
+      <div class="panel-title">Top Books</div>
+      <span class="panel-tag">OPEN LIBRARY</span>
+    </div>
+    <div class="book-list" id="book-list"><div class="news-loading">⟳ Loading…</div></div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="panel" id="notes">
+    <div class="panel-header">
+      <div class="dot orange"></div>
+      <div class="panel-title">Mission Notes</div>
+      <span class="panel-tag">LOCAL</span>
+    </div>
+    <div class="panel-body" id="notes-body">
+      <div class="todo-list" id="todo-list"></div>
+      <div class="todo-add-row">
+        <input class="dash-input" id="todo-input" placeholder="Add task…" onkeydown="if(event.key==='Enter')addTodo()" />
+        <button class="dash-btn" onclick="addTodo()">+ ADD</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ══ STATUS BAR ═══════════════════════════════════════════ -->
+<div id="statusbar">
+  <div class="sb-item"><div class="sb-dot"></div> SYSTEM ONLINE</div>
+  <div class="sb-item"><div class="sb-dot orange"></div> CRYPTO FEED ACTIVE</div>
+  <div class="sb-item" id="sb-weather-status">⬡ WEATHER STANDBY</div>
+  <div class="sb-item" id="sb-news-status">◈ NEWS LOADING</div>
+  <div style="margin-left:auto;color:var(--dim)">JACKSONVILLE // ALABAMA // USA</div>
+</div>
+
+<!-- ══ SCRIPTS ═══════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ──────────────────────────────────────────────────────────────
+// CONFIG — Edit these if you want to pre-bake your API keys
+// ──────────────────────────────────────────────────────────────
+const CONFIG = {
+  OWM_KEY:  localStorage.getItem('owm_key')  || '',
+  TMDB_KEY: localStorage.getItem('tmdb_key') || '',
+  RAWG_KEY: localStorage.getItem('rawg_key') || '',
+  ZIP:      localStorage.getItem('wx_zip')   || '35957',
+};
+
+// ─── CLOCK ────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock-time').textContent =
+    now.toLocaleTimeString('en-US', { hour12: false });
+  document.getElementById('clock-date').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }).toUpperCase();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── WEATHER ──────────────────────────────────────────────────
+const WX_ICONS = {
+  Thunderstorm:'⛈', Drizzle:'🌦', Rain:'🌧', Snow:'❄️',
+  Mist:'🌫', Smoke:'🌫', Haze:'🌫', Dust:'💨', Fog:'🌫',
+  Sand:'💨', Ash:'🌋', Squall:'💨', Tornado:'🌪',
+  Clear:'☀️', Clouds:'☁️',
+};
+
+function loadWeather() {
+  const key = document.getElementById('wx-key').value.trim();
+  const zip = document.getElementById('wx-zip').value.trim() || CONFIG.ZIP;
+  if (!key) { alert('Please enter your OpenWeatherMap API key.'); return; }
+  localStorage.setItem('owm_key', key);
+  localStorage.setItem('wx_zip', zip);
+  CONFIG.OWM_KEY = key; CONFIG.ZIP = zip;
+  fetchWeather();
+}
+
+async function fetchWeather() {
+  if (!CONFIG.OWM_KEY) {
+    // Show setup if key field empty
+    if (document.getElementById('wx-key').value)
+      document.getElementById('wx-key').value = CONFIG.OWM_KEY;
+    return;
+  }
+  const url = `https://api.openweathermap.org/data/2.5/weather?zip=${CONFIG.ZIP},US&appid=${CONFIG.OWM_KEY}&units=imperial`;
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d.cod !== 200) throw new Error(d.message);
+    const icon = WX_ICONS[d.weather[0].main] || '🌡';
+    const setup = document.getElementById('weather-setup');
+    const data  = document.getElementById('weather-data');
+    setup.style.display = 'none';
+    data.style.display = 'block';
+    data.innerHTML = `
+      <div class="weather-main">
+        <div class="weather-icon">${icon}</div>
+        <div class="weather-temp">${Math.round(d.main.temp)}<sup>°F</sup></div>
+        <div class="weather-desc">${d.weather[0].description}</div>
+        <div class="weather-city">${d.name}</div>
+      </div>
+      <div class="weather-grid">
+        <div class="weather-stat"><div class="weather-stat-label">Feels Like</div><div class="weather-stat-val">${Math.round(d.main.feels_like)}°</div></div>
+        <div class="weather-stat"><div class="weather-stat-label">Humidity</div><div class="weather-stat-val">${d.main.humidity}%</div></div>
+        <div class="weather-stat"><div class="weather-stat-label">Wind</div><div class="weather-stat-val">${Math.round(d.wind.speed)} mph</div></div>
+        <div class="weather-stat"><div class="weather-stat-label">Visibility</div><div class="weather-stat-val">${d.visibility ? (d.visibility/1609).toFixed(1)+'mi' : 'N/A'}</div></div>
+        <div class="weather-stat"><div class="weather-stat-label">Hi / Lo</div><div class="weather-stat-val">${Math.round(d.main.temp_max)}° / ${Math.round(d.main.temp_min)}°</div></div>
+        <div class="weather-stat"><div class="weather-stat-label">Pressure</div><div class="weather-stat-val">${d.main.pressure} hPa</div></div>
+      </div>`;
+    document.getElementById('sb-weather-status').textContent = `◉ WX LIVE · ${d.name.toUpperCase()}`;
+  } catch(e) {
+    document.getElementById('weather-data').innerHTML = `<div class="err-msg">Error: ${e.message}<br><br><small>Check API key and zip code.</small></div>`;
+    document.getElementById('weather-data').style.display = 'block';
+  }
+}
+
+// Auto-load weather if we have a saved key
+if (CONFIG.OWM_KEY) {
+  document.getElementById('wx-key').value = CONFIG.OWM_KEY;
+  document.getElementById('wx-zip').value = CONFIG.ZIP;
+  fetchWeather();
+}
+
+// ─── CRYPTO ───────────────────────────────────────────────────
+async function loadCrypto() {
+  const ids = 'bitcoin,ripple,zcash';
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    const coins = [
+      { id:'bitcoin', sym:'BTC', name:'Bitcoin',  cls:'btc' },
+      { id:'ripple',  sym:'XRP', name:'Ripple XRP', cls:'xrp' },
+      { id:'zcash',   sym:'ZEC', name:'Zcash',     cls:'zec' },
+    ];
+    const grid = document.getElementById('crypto-grid');
+    grid.innerHTML = coins.map(c => {
+      const info = d[c.id];
+      if (!info) return '';
+      const price = info.usd;
+      const chg   = info.usd_24h_change;
+      const fmt   = price >= 1000
+        ? '$' + price.toLocaleString('en-US', {maximumFractionDigits: 2})
+        : '$' + price.toFixed(4);
+      const chgCls = chg >= 0 ? 'up' : 'down';
+      const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+      return `<div class="crypto-card ${c.cls}">
+        <div class="crypto-sym">${c.sym}</div>
+        <div class="crypto-name">${c.name}</div>
+        <div class="crypto-price">${fmt}</div>
+        <div class="crypto-change ${chgCls}">${chgStr} 24h</div>
+      </div>`;
+    }).join('');
+    document.getElementById('crypto-ts').textContent = new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('crypto-grid').innerHTML = `<div class="err-msg">CoinGecko API unavailable</div>`;
+  }
+}
+loadCrypto();
+setInterval(loadCrypto, 60000);
+
+// ─── STOCKS ───────────────────────────────────────────────────
+let STOCKS = JSON.parse(localStorage.getItem('dash_stocks') || '["SPY","QQQ","NVDA","TSLA"]');
+
+function saveStocks() { localStorage.setItem('dash_stocks', JSON.stringify(STOCKS)); }
+
+async function fetchStock(sym) {
+  // Using Yahoo Finance via a public CORS proxy
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    const meta = d.chart.result[0].meta;
+    const price = meta.regularMarketPrice;
+    const prev  = meta.previousClose || meta.chartPreviousClose;
+    const chg   = ((price - prev) / prev) * 100;
+    return { sym, price, chg, name: meta.shortName || sym };
+  } catch {
+    return { sym, price: null, chg: 0, name: sym };
+  }
+}
+
+async function loadStocks() {
+  const list = document.getElementById('stock-list');
+  list.innerHTML = STOCKS.map(s => `<div class="stock-row" id="sr-${s}">
+    <span class="stock-sym">${s}</span>
+    <span class="stock-name">Loading…</span>
+    <span class="stock-price">—</span>
+    <span class="stock-change">—</span>
+    <span style="cursor:pointer;color:var(--muted);font-size:12px;margin-left:8px" onclick="removeStock('${s}')">✕</span>
+  </div>`).join('');
+
+  for (const sym of STOCKS) {
+    const d = await fetchStock(sym);
+    const row = document.getElementById(`sr-${sym}`);
+    if (!row) continue;
+    if (d.price === null) {
+      row.querySelector('.stock-price').textContent = 'N/A';
+      continue;
+    }
+    row.querySelector('.stock-name').textContent = d.name.substring(0, 18);
+    row.querySelector('.stock-price').textContent = '$' + d.price.toFixed(2);
+    const chgEl = row.querySelector('.stock-change');
+    chgEl.textContent = (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%';
+    chgEl.className = 'stock-change ' + (d.chg >= 0 ? 'up' : 'down');
+  }
+}
+
+function addStock() {
+  const sym = document.getElementById('stock-input').value.trim().toUpperCase();
+  if (!sym || STOCKS.includes(sym)) return;
+  STOCKS.push(sym);
+  saveStocks();
+  document.getElementById('stock-input').value = '';
+  loadStocks();
+}
+
+function removeStock(sym) {
+  STOCKS = STOCKS.filter(s => s !== sym);
+  saveStocks();
+  loadStocks();
+}
+
+loadStocks();
+setInterval(loadStocks, 300000); // refresh every 5 min
+
+// ─── QUOTES ───────────────────────────────────────────────────
+const QUOTES = [
+  { t: "The best way to predict the future is to invent it.", a: "Alan Kay" },
+  { t: "Any sufficiently advanced technology is indistinguishable from magic.", a: "Arthur C. Clarke" },
+  { t: "The quieter you become, the more you are able to hear.", a: "Rumi" },
+  { t: "Do not go where the path may lead; go instead where there is no path and leave a trail.", a: "Ralph Waldo Emerson" },
+  { t: "The purpose of our lives is to be happy.", a: "Dalai Lama" },
+  { t: "It does not matter how slowly you go as long as you do not stop.", a: "Confucius" },
+  { t: "Everything you can imagine is real.", a: "Pablo Picasso" },
+  { t: "The only way to do great work is to love what you do.", a: "Steve Jobs" },
+  { t: "Logic will get you from A to Z; imagination will get you everywhere.", a: "Albert Einstein" },
+  { t: "Success is not final, failure is not fatal; it is the courage to continue that counts.", a: "Winston Churchill" },
+  { t: "In the middle of every difficulty lies opportunity.", a: "Albert Einstein" },
+  { t: "The mind is everything. What you think you become.", a: "Buddha" },
+  { t: "Not all those who wander are lost.", a: "J.R.R. Tolkien" },
+  { t: "Be yourself; everyone else is already taken.", a: "Oscar Wilde" },
+  { t: "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.", a: "Albert Einstein" },
+];
+let qIndex = Math.floor(Math.random() * QUOTES.length);
+function nextQuote() {
+  qIndex = (qIndex + 1) % QUOTES.length;
+  document.getElementById('quote-text').textContent = QUOTES[qIndex].t;
+  document.getElementById('quote-author').textContent = '// ' + QUOTES[qIndex].a.toUpperCase();
+}
+nextQuote();
+
+// ─── NEWS ─────────────────────────────────────────────────────
+const NEWS_FEEDS = {
+  world:         'https://feeds.bbci.co.uk/news/world/rss.xml',
+  us:            'https://feeds.bbci.co.uk/news/rss.xml',
+  alabama:       'https://rss.app/feeds/qK3ZBs5sPSxnvjSs.xml',  // AL.com Alabama
+  local:         'https://rss.app/feeds/v1.1/qK3ZBs5sPSxnvjSs.xml', // fallback to AL.com
+  tech:          'https://feeds.feedburner.com/TechCrunch',
+  entertainment: 'https://variety.com/feed/',
+};
+
+// We use rss2json as a CORS-safe RSS proxy
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+const NEWS_FEEDS_SAFE = {
+  world:         'https://feeds.bbci.co.uk/news/world/rss.xml',
+  us:            'https://feeds.bbci.co.uk/news/rss.xml',
+  alabama:       'https://www.al.com/arc/outboundfeeds/rss/category/news/alabama/?outputType=xml',
+  local:         'https://www.al.com/arc/outboundfeeds/rss/category/news/?outputType=xml',
+  tech:          'https://techcrunch.com/feed/',
+  entertainment: 'https://variety.com/feed/',
+};
+
+let loadedTabs = {};
+
+function renderNews(key, items) {
+  const html = items.slice(0, 8).map((item, i) => `
+    <div class="news-item">
+      <div class="news-num">${String(i+1).padStart(2,'0')}</div>
+      <div>
+        <div class="news-title" onclick="window.open('${item.link}','_blank')">${item.title}</div>
+        <div class="news-meta">${item.pubDate ? new Date(item.pubDate).toLocaleString() : ''} ${item.author ? '· '+item.author : ''}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById(`ntab-${key}`).innerHTML = html;
+  loadedTabs[key] = true;
+}
+
+async function loadNewsTab(key) {
+  if (loadedTabs[key]) return;
+  const el = document.getElementById(`ntab-${key}`);
+  if (!el) return;
+  el.innerHTML = '<div class="news-loading"><span class="spinning">⟳</span> Loading feed…</div>';
+  const feedUrl = encodeURIComponent(NEWS_FEEDS_SAFE[key]);
+  try {
+    const r = await fetch(`${RSS2JSON}${feedUrl}&count=10`);
+    const d = await r.json();
+    if (d.status === 'ok' && d.items && d.items.length) {
+      renderNews(key, d.items);
+    } else {
+      el.innerHTML = '<div class="err-msg">Feed unavailable. Try refreshing or check network settings.</div>';
+    }
+  } catch(e) {
+    el.innerHTML = `<div class="err-msg">Could not load feed: ${e.message}</div>`;
+  }
+}
+
+function buildNewsPanels() {
+  const container = document.getElementById('news-panels');
+  const keys = ['world','us','alabama','local','tech','entertainment'];
+  container.innerHTML = keys.map((k, i) =>
+    `<div class="news-content${i===0?' active':''}" id="ntab-${k}">
+       <div class="news-loading"><span class="spinning">⟳</span> Loading feed…</div>
+     </div>`).join('');
+  loadNewsTab('world'); // load first tab immediately
+  document.getElementById('sb-news-status').textContent = '◉ NEWS FEEDS ACTIVE';
+}
+
+function switchTab(key) {
+  document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.news-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`ntab-${key}`).classList.add('active');
+  loadNewsTab(key);
+}
+
+buildNewsPanels();
+
+// ─── MOVIES ───────────────────────────────────────────────────
+async function loadMovies() {
+  const key = (document.getElementById('tmdb-key')?.value.trim()) || CONFIG.TMDB_KEY;
+  if (!key) {
+    document.getElementById('movies-setup').style.display = 'block';
+    document.getElementById('movie-list').innerHTML = '';
+    return;
+  }
+  localStorage.setItem('tmdb_key', key);
+  CONFIG.TMDB_KEY = key;
+  document.getElementById('movies-setup').style.display = 'none';
+  const list = document.getElementById('movie-list');
+  list.innerHTML = '<div class="news-loading"><span class="spinning">⟳</span></div>';
+  try {
+    const r = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${key}`);
+    const d = await r.json();
+    if (d.results) {
+      list.innerHTML = d.results.slice(0, 8).map((m, i) => {
+        const poster = m.poster_path
+          ? `<img class="movie-poster" src="https://image.tmdb.org/t/p/w92${m.poster_path}" alt="" loading="lazy">`
+          : `<div class="movie-poster"></div>`;
+        return `<div class="movie-item">
+          <div class="movie-rank">${String(i+1).padStart(2,'0')}</div>
+          ${poster}
+          <div class="movie-info">
+            <div class="movie-title">${m.title}</div>
+            <div class="movie-meta">${m.release_date?.slice(0,4) || '—'} &middot; <span class="movie-score">★ ${m.vote_average?.toFixed(1)}</span></div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      list.innerHTML = '<div class="err-msg">Invalid TMDB key</div>';
+      document.getElementById('movies-setup').style.display = 'block';
+    }
+  } catch(e) {
+    list.innerHTML = `<div class="err-msg">${e.message}</div>`;
+  }
+}
+loadMovies();
+
+// ─── GAMES ────────────────────────────────────────────────────
+async function loadGames() {
+  const key = (document.getElementById('rawg-key')?.value.trim()) || CONFIG.RAWG_KEY;
+  if (!key) {
+    document.getElementById('games-setup').style.display = 'block';
+    document.getElementById('game-list').innerHTML = '';
+    return;
+  }
+  localStorage.setItem('rawg_key', key);
+  CONFIG.RAWG_KEY = key;
+  document.getElementById('games-setup').style.display = 'none';
+  const list = document.getElementById('game-list');
+  list.innerHTML = '<div class="news-loading"><span class="spinning">⟳</span></div>';
+  try {
+    // Top rated games in the last 12 months
+    const today = new Date();
+    const y1 = new Date(today); y1.setFullYear(today.getFullYear()-1);
+    const fmt = d => d.toISOString().slice(0,10);
+    const url = `https://api.rawg.io/api/games?key=${key}&ordering=-rating&page_size=10&dates=${fmt(y1)},${fmt(today)}&metacritic=60,100`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d.results) {
+      list.innerHTML = d.results.slice(0, 8).map((g, i) => {
+        const img = g.background_image
+          ? `<img class="game-img" src="${g.background_image}" alt="" loading="lazy">`
+          : `<div class="game-img"></div>`;
+        const platforms = g.platforms?.slice(0,3).map(p => p.platform.name).join(', ') || '—';
+        return `<div class="game-item">
+          <div class="game-rank">${i+1}</div>
+          ${img}
+          <div style="flex:1;min-width:0">
+            <div class="game-name">${g.name}</div>
+            <div class="game-meta">${platforms}</div>
+          </div>
+          <div class="game-score">${g.rating?.toFixed(1) || '—'}</div>
+        </div>`;
+      }).join('');
+    } else {
+      list.innerHTML = '<div class="err-msg">Invalid RAWG key</div>';
+      document.getElementById('games-setup').style.display = 'block';
+    }
+  } catch(e) {
+    list.innerHTML = `<div class="err-msg">${e.message}</div>`;
+  }
+}
+loadGames();
+
+// ─── BOOKS ────────────────────────────────────────────────────
+async function loadBooks() {
+  // Open Library trending / bestsellers via NYT bestseller proxy
+  const list = document.getElementById('book-list');
+  // We'll pull NYT bestsellers via Open Library's subjects API (no key needed)
+  const url = 'https://openlibrary.org/search.json?q=subject:fiction&sort=new&limit=8&fields=title,author_name,cover_i,first_publish_year';
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    const books = d.docs?.slice(0,8) || [];
+    if (!books.length) { list.innerHTML = '<div class="err-msg">No results</div>'; return; }
+    list.innerHTML = books.map(b => {
+      const cover = b.cover_i
+        ? `<img class="book-cover" src="https://covers.openlibrary.org/b/id/${b.cover_i}-S.jpg" alt="" loading="lazy">`
+        : `<div class="book-cover"></div>`;
+      return `<div class="book-item">
+        ${cover}
+        <div>
+          <div class="book-title">${b.title}</div>
+          <div class="book-author">${(b.author_name?.[0]) || 'Unknown'} · ${b.first_publish_year || ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div class="err-msg">${e.message}</div>`;
+  }
+}
+loadBooks();
+
+// ─── TO-DO / NOTES ────────────────────────────────────────────
+let todos = JSON.parse(localStorage.getItem('dash_todos') || '[]');
+
+function saveTodos() { localStorage.setItem('dash_todos', JSON.stringify(todos)); }
+
+function renderTodos() {
+  const list = document.getElementById('todo-list');
+  if (!todos.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:11px;padding:4px 0;font-family:Share Tech Mono,monospace">// No tasks queued</div>';
+    return;
+  }
+  list.innerHTML = todos.map((t, i) => `
+    <div class="todo-item">
+      <input type="checkbox" class="todo-cb" ${t.done?'checked':''} onchange="toggleTodo(${i})" />
+      <span class="todo-text${t.done?' done':''}">${t.text}</span>
+      <span class="todo-del" onclick="deleteTodo(${i})">✕</span>
+    </div>`).join('');
+}
+
+function addTodo() {
+  const inp = document.getElementById('todo-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  todos.push({ text, done: false });
+  saveTodos();
+  inp.value = '';
+  renderTodos();
+}
+
+function toggleTodo(i) {
+  todos[i].done = !todos[i].done;
+  saveTodos();
+  renderTodos();
+}
+
+function deleteTodo(i) {
+  todos.splice(i, 1);
+  saveTodos();
+  renderTodos();
+}
+
+renderTodos();
+
+// ─── PERIODIC REFRESH ─────────────────────────────────────────
+// Refresh crypto every 60s, weather every 10min
+setInterval(() => { if (CONFIG.OWM_KEY) fetchWeather(); }, 600000);
+</script>
+</body>
+</html>
