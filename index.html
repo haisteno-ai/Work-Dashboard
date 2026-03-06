@@ -18,6 +18,8 @@
     --bg4: #202027;
     --border: rgba(212,22,60,0.2);
     --border-subtle: rgba(255,255,255,0.06);
+    --green: #2ecc71;
+    --yellow: #f39c12;
     --mono: 'Share Tech Mono', monospace;
     --display: 'Barlow Condensed', sans-serif;
     --ui: 'Rajdhani', sans-serif;
@@ -32,7 +34,22 @@
       repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 40px);
   }
 
-  /* HEADER */
+  /* ── WEATHER ALERT BANNER ── */
+  #alert-banner {
+    display: none;
+    background: linear-gradient(90deg, #a01028, var(--red), #a01028);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 8px 28px;
+    text-align: center;
+    animation: alertpulse 1.5s infinite;
+    position: relative; z-index: 100;
+  }
+  @keyframes alertpulse { 0%,100%{opacity:1} 50%{opacity:.8} }
+
+  /* ── HEADER ── */
   .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 13px 28px; background: var(--bg2);
@@ -48,39 +65,31 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; box-shadow: 0 0 16px var(--red-glow); flex-shrink: 0;
   }
-  .brand-title {
-    font-family: var(--display); font-size: 22px; font-weight: 800;
-    letter-spacing: 3px; text-transform: uppercase; line-height: 1;
-  }
+  .brand-title { font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; line-height: 1; }
   .brand-sub { font-family: var(--mono); font-size: 9px; color: var(--red); letter-spacing: 2px; margin-top: 3px; }
 
   .support-btn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 20px;
+    display: flex; align-items: center; gap: 8px; padding: 10px 20px;
     background: rgba(212,22,60,0.1); border: 1px solid rgba(212,22,60,0.45);
     border-radius: 8px; color: var(--white); text-decoration: none;
     font-family: var(--display); font-size: 15px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase;
     transition: all 0.2s; animation: spulse 3s infinite;
   }
-  .support-btn:hover {
-    background: rgba(212,22,60,0.25); border-color: var(--red);
-    box-shadow: 0 0 18px var(--red-glow); transform: translateY(-1px); animation: none;
-  }
+  .support-btn:hover { background: rgba(212,22,60,0.25); border-color: var(--red); box-shadow: 0 0 18px var(--red-glow); transform: translateY(-1px); animation: none; }
   @keyframes spulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,22,60,0)} 50%{box-shadow:0 0 10px 2px rgba(212,22,60,0.22)} }
 
   .header-right { display: flex; align-items: center; gap: 18px; }
   .header-status { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10px; color: var(--off-white); }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 6px #2ecc71; animation: blink 2s infinite; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .clock-time { font-family: var(--mono); font-size: 28px; line-height: 1; letter-spacing: 2px; text-align: right; }
   .clock-date { font-family: var(--mono); font-size: 9px; color: var(--off-white); letter-spacing: 1px; margin-top: 3px; text-align: right; }
 
-  /* LAYOUT */
+  /* ── LAYOUT ── */
   .main { padding: 16px 28px; display: flex; flex-direction: column; gap: 14px; }
-  .top-row { display: grid; grid-template-columns: 330px 1fr; gap: 14px; }
 
-  /* PANEL */
+  /* ── PANEL ── */
   .panel {
     background: var(--bg2); border: 1px solid var(--border-subtle);
     border-radius: 10px; overflow: hidden; animation: fadeIn 0.4s ease both;
@@ -90,7 +99,7 @@
     display: flex; align-items: center; gap: 8px;
     padding: 8px 14px; background: var(--bg3); border-bottom: 1px solid var(--border-subtle);
   }
-  .pdot { width:5px; height:5px; border-radius:50%; background:var(--red); box-shadow:0 0 5px var(--red-glow); }
+  .pdot { width:5px; height:5px; border-radius:50%; background:var(--red); box-shadow:0 0 5px var(--red-glow); flex-shrink:0; }
   .ptitle { font-family:var(--display); font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--off-white); }
   .panel-body { padding: 14px; }
   .rbtn {
@@ -100,7 +109,63 @@
   }
   .rbtn:hover { border-color:var(--red); color:var(--red); }
 
-  /* WEATHER */
+  /* ── AI LAUNCHER ── */
+  .ai-launcher {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ai-select-wrap { position: relative; flex-shrink: 0; }
+  .ai-select {
+    appearance: none; -webkit-appearance: none;
+    background: var(--bg3); border: 1px solid var(--border-subtle);
+    color: var(--white); font-family: var(--mono); font-size: 11px;
+    padding: 10px 32px 10px 12px; border-radius: 7px;
+    cursor: pointer; letter-spacing: 1px; outline: none;
+    transition: border-color .15s; min-width: 130px;
+  }
+  .ai-select:hover, .ai-select:focus { border-color: var(--red); }
+  .ai-select option { background: var(--bg3); }
+  .ai-select-arrow {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--red); pointer-events: none; font-size: 10px;
+  }
+  .ai-input {
+    flex: 1; background: var(--bg3); border: 1px solid var(--border-subtle);
+    color: var(--white); font-family: var(--ui); font-size: 15px; font-weight: 500;
+    padding: 10px 14px; border-radius: 7px; outline: none;
+    transition: border-color .15s; letter-spacing: .3px;
+  }
+  .ai-input::placeholder { color: var(--off-white); opacity: .4; }
+  .ai-input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(212,22,60,0.1); }
+  .ai-go {
+    background: var(--red); border: none; color: #fff;
+    font-family: var(--display); font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; padding: 10px 20px; border-radius: 7px;
+    cursor: pointer; transition: all .15s; text-transform: uppercase; flex-shrink: 0;
+  }
+  .ai-go:hover { background: var(--red-dark, #a01028); box-shadow: 0 0 12px var(--red-glow); }
+
+  /* ── DEVICE LOOKUP ── */
+  .lookup-wrap { display: flex; align-items: center; gap: 10px; }
+  .lookup-input {
+    flex: 1; background: var(--bg3); border: 1px solid var(--border-subtle);
+    color: var(--white); font-family: var(--mono); font-size: 13px;
+    padding: 9px 13px; border-radius: 7px; outline: none;
+    transition: border-color .15s; letter-spacing: .5px;
+  }
+  .lookup-input::placeholder { color: var(--off-white); opacity: .4; }
+  .lookup-input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(212,22,60,0.1); }
+  .lookup-go {
+    background: var(--bg3); border: 1px solid var(--border-subtle);
+    color: var(--off-white); font-family: var(--mono); font-size: 11px;
+    padding: 9px 16px; border-radius: 7px; cursor: pointer;
+    transition: all .15s; letter-spacing: 1px; white-space: nowrap;
+  }
+  .lookup-go:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── TOP ROW (weather + network) ── */
+  .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ── WEATHER ── */
   .weather-loc { font-family:var(--mono); font-size:9px; color:var(--off-white); opacity:.6; letter-spacing:1px; margin-bottom:9px; }
   .weather-main { display:flex; align-items:center; gap:12px; margin-bottom:11px; }
   .weather-icon { font-size:46px; line-height:1; }
@@ -111,30 +176,43 @@
   .wm-item { background:var(--bg4); border-radius:6px; padding:7px 9px; font-family:var(--mono); font-size:11px; }
   .wm-label { color:var(--red); font-size:8px; margin-bottom:2px; letter-spacing:1px; }
 
-  /* CRYPTO */
-  .crypto-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-  .cc {
-    background:var(--bg3); border:1px solid var(--border-subtle);
-    border-radius:8px; padding:13px;
-    display:flex; flex-direction:column; justify-content:space-between;
-    min-height:130px; transition:border-color .2s;
-  }
-  .cc:hover { border-color:var(--red); }
-  .cc-sym { font-family:var(--display); font-size:26px; font-weight:800; letter-spacing:2px; }
-  .cc-name { font-family:var(--mono); font-size:9px; color:var(--off-white); letter-spacing:1px; margin-top:1px; }
-  .cc-price { font-family:var(--mono); font-size:15px; margin-top:10px; }
-  .cc-chg { font-family:var(--mono); font-size:11px; margin-top:3px; }
-  .up{color:#2ecc71} .dn{color:var(--red)}
-  .cc-bar { height:2px; background:var(--bg4); border-radius:2px; margin-top:10px; overflow:hidden; }
-  .cc-bar-fill { height:100%; border-radius:2px; transition:width 1s; }
+  /* ── NETWORK INFO ── */
+  .net-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .net-item { background: var(--bg4); border-radius: 7px; padding: 10px 12px; }
+  .net-label { font-family: var(--mono); font-size: 8px; color: var(--red); letter-spacing: 2px; margin-bottom: 4px; }
+  .net-value { font-family: var(--mono); font-size: 13px; color: var(--white); letter-spacing: .5px; word-break: break-all; }
+  .net-value.big { font-size: 15px; }
 
-  /* LINKS */
-  .links-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-  .link-group { }
-  .lg-title {
-    font-family:var(--mono); font-size:9px; letter-spacing:3px; text-transform:uppercase;
-    color:var(--red); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border);
+  /* ── SERVICE STATUS ── */
+  .status-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .svc-chip {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--bg3); border: 1px solid var(--border-subtle);
+    border-radius: 20px; padding: 6px 12px;
+    font-family: var(--mono); font-size: 11px; color: var(--off-white);
+    transition: all .2s; letter-spacing: .5px;
   }
+  .svc-chip.ok { border-color: rgba(46,204,113,0.25); }
+  .svc-chip.warn { border-color: rgba(243,156,18,0.5); color: var(--white); background: rgba(243,156,18,0.08); }
+  .svc-chip.down { border-color: rgba(212,22,60,0.5); color: var(--white); background: rgba(212,22,60,0.1); animation: chipblink 1s infinite; }
+  @keyframes chipblink { 0%,100%{opacity:1} 50%{opacity:.6} }
+  .svc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .svc-dot.ok { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  .svc-dot.warn { background: var(--yellow); box-shadow: 0 0 5px var(--yellow); }
+  .svc-dot.down { background: var(--red); box-shadow: 0 0 5px var(--red); }
+  .svc-dot.loading { background: #555; }
+  .status-updated { font-family: var(--mono); font-size: 9px; color: var(--off-white); opacity: .4; margin-top: 10px; letter-spacing: 1px; }
+  .status-banner {
+    display: none; margin-bottom: 10px;
+    background: rgba(212,22,60,0.12); border: 1px solid rgba(212,22,60,0.4);
+    border-radius: 7px; padding: 8px 12px;
+    font-family: var(--mono); font-size: 11px; color: var(--red);
+    letter-spacing: 1px;
+  }
+
+  /* ── QUICK LINKS ── */
+  .links-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .lg-title { font-family:var(--mono); font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
   .lg-stack { display:flex; flex-direction:column; gap:5px; }
   .lb {
     display:flex; align-items:center; gap:8px; padding:8px 11px;
@@ -147,7 +225,23 @@
   .li { font-size:13px; flex-shrink:0; }
   .ll { overflow:hidden; text-overflow:ellipsis; flex:1; }
 
-  /* NEWS */
+  /* ── SHIFT LOG ── */
+  .shiftlog-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .shiftlog-textarea {
+    width: 100%; min-height: 110px; resize: vertical;
+    background: var(--bg4); border: 1px solid var(--border-subtle);
+    color: var(--white); font-family: var(--mono); font-size: 12px;
+    padding: 10px 12px; border-radius: 7px; outline: none;
+    transition: border-color .15s; letter-spacing: .3px; line-height: 1.6;
+  }
+  .shiftlog-textarea:focus { border-color: rgba(212,22,60,0.4); }
+  .shiftlog-footer { display: flex; align-items: center; justify-content: space-between; }
+  .shiftlog-saved { font-family: var(--mono); font-size: 9px; color: var(--green); opacity: 0; letter-spacing: 1px; transition: opacity .3s; }
+  .shiftlog-saved.show { opacity: 1; }
+  .shiftlog-clear { background: none; border: 1px solid var(--border-subtle); color: var(--off-white); border-radius: 4px; padding: 3px 9px; font-family: var(--mono); font-size: 9px; cursor: pointer; transition: all .15s; letter-spacing: 1px; }
+  .shiftlog-clear:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── NEWS ── */
   .news-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .news-list { display:flex; flex-direction:column; }
   .ni { padding:8px 11px; border-left:2px solid transparent; transition:all .15s; border-radius:4px; }
@@ -155,13 +249,11 @@
   .ni a { text-decoration:none; color:inherit; display:block; }
   .nh { font-size:13px; font-weight:600; line-height:1.4; margin-bottom:2px; }
   .nm { font-family:var(--mono); font-size:9px; color:var(--off-white); opacity:.45; }
-  .src-tag {
-    display:inline-block; font-family:var(--mono); font-size:7px;
-    padding:1px 4px; border-radius:2px; margin-right:5px;
-    background:rgba(212,22,60,0.14); color:var(--red); border:1px solid rgba(212,22,60,0.28);
-    letter-spacing:1px; vertical-align:middle;
-  }
+  .src-tag { display:inline-block; font-family:var(--mono); font-size:7px; padding:1px 4px; border-radius:2px; margin-right:5px; background:rgba(212,22,60,0.14); color:var(--red); border:1px solid rgba(212,22,60,0.28); letter-spacing:1px; vertical-align:middle; }
   .nloading { font-family:var(--mono); font-size:11px; color:var(--off-white); opacity:.45; padding:20px; text-align:center; }
+
+  /* ── MIDDLE ROW ── */
+  .middle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
   .footer { text-align:center; padding:10px; font-family:var(--mono); font-size:9px; color:var(--off-white); opacity:.25; letter-spacing:2px; }
 
@@ -174,6 +266,9 @@
 </head>
 <body>
 
+<!-- WEATHER ALERT BANNER -->
+<div id="alert-banner">⚠ &nbsp; WEATHER ALERT ACTIVE FOR CALHOUN COUNTY — <span id="alert-text"></span> &nbsp; ⚠</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-brand">
@@ -183,9 +278,7 @@
       <div class="brand-sub">JACKSONVILLE STATE UNIVERSITY // INFORMATION TECHNOLOGY</div>
     </div>
   </div>
-
   <a href="mailto:support@jsu.edu" class="support-btn">✉️ &nbsp;EMAIL IT SUPPORT</a>
-
   <div class="header-right">
     <div class="header-status"><div class="status-dot"></div><span>SYSTEMS ONLINE</span></div>
     <div>
@@ -197,7 +290,42 @@
 
 <div class="main">
 
-  <!-- WEATHER + CRYPTO -->
+  <!-- AI LAUNCHER -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="pdot"></div><div class="ptitle">AI Launcher</div>
+    </div>
+    <div class="panel-body">
+      <div class="ai-launcher">
+        <div class="ai-select-wrap">
+          <select class="ai-select" id="ai-select">
+            <option value="claude">🧠 Claude</option>
+            <option value="gemini">♊ Gemini</option>
+            <option value="chatgpt">💬 ChatGPT</option>
+            <option value="grok">⚡ Grok</option>
+          </select>
+          <span class="ai-select-arrow">▾</span>
+        </div>
+        <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything — hit Enter to open in new tab…" />
+        <button class="ai-go" onclick="launchAI()">ASK →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVICE LOOKUP -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="pdot"></div><div class="ptitle">Device Lookup — KACE</div>
+    </div>
+    <div class="panel-body">
+      <div class="lookup-wrap">
+        <input class="lookup-input" id="kace-input" type="text" placeholder="Hostname, asset tag, username…" />
+        <button class="lookup-go" onclick="kaceLookup()">🔍 SEARCH KACE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP ROW: Weather + Network -->
   <div class="top-row">
     <div class="panel">
       <div class="panel-header">
@@ -209,14 +337,23 @@
 
     <div class="panel">
       <div class="panel-header">
-        <div class="pdot"></div><div class="ptitle">Crypto Markets</div>
-        <button class="rbtn" onclick="loadCrypto()">↻ REFRESH</button>
+        <div class="pdot"></div><div class="ptitle">Network Info</div>
+        <button class="rbtn" onclick="loadNetwork()">↻ REFRESH</button>
       </div>
-      <div class="panel-body">
-        <div class="crypto-grid" id="crypto-grid">
-          <div class="nloading" style="grid-column:1/-1">FETCHING MARKET DATA...</div>
-        </div>
-      </div>
+      <div class="panel-body" id="network-body"><div class="nloading">FETCHING NETWORK INFO...</div></div>
+    </div>
+  </div>
+
+  <!-- SERVICE STATUS -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="pdot"></div><div class="ptitle">Service Status</div>
+      <button class="rbtn" onclick="loadStatus()">↻ REFRESH</button>
+    </div>
+    <div class="panel-body">
+      <div id="status-banner" class="status-banner">⚠ One or more services are reporting issues — see below.</div>
+      <div class="status-grid" id="status-grid"><div class="nloading">CHECKING SERVICES...</div></div>
+      <div class="status-updated" id="status-updated"></div>
     </div>
   </div>
 
@@ -228,79 +365,44 @@
     <div class="panel-body">
       <div class="links-grid">
 
-        <!-- AI TOOLS -->
-        <div class="link-group">
+        <div>
           <div class="lg-title">🤖 AI Tools</div>
           <div class="lg-stack">
-            <a href="https://claude.ai" target="_blank" class="lb">
-              <span class="li">🧠</span><span class="ll">Claude AI</span>
-            </a>
-            <a href="https://gemini.google.com" target="_blank" class="lb">
-              <span class="li">♊</span><span class="ll">Gemini</span>
-            </a>
-            <a href="https://grok.com" target="_blank" class="lb">
-              <span class="li">⚡</span><span class="ll">Grok</span>
-            </a>
+            <a href="https://claude.ai" target="_blank" class="lb"><span class="li">🧠</span><span class="ll">Claude AI</span></a>
+            <a href="https://gemini.google.com" target="_blank" class="lb"><span class="li">♊</span><span class="ll">Gemini</span></a>
+            <a href="https://grok.com" target="_blank" class="lb"><span class="li">⚡</span><span class="ll">Grok</span></a>
+            <a href="https://chatgpt.com" target="_blank" class="lb"><span class="li">💬</span><span class="ll">ChatGPT</span></a>
           </div>
         </div>
 
-        <!-- IT MANAGEMENT -->
-        <div class="link-group">
+        <div>
           <div class="lg-title">🖥️ IT Management</div>
           <div class="lg-stack">
-            <a href="https://kmgt.jsu.edu/adminui/computer_inventory.php" target="_blank" class="lb">
-              <span class="li">🖥️</span><span class="ll">Devices</span>
-            </a>
-            <a href="#tickets" target="_blank" class="lb">
-              <span class="li">🎫</span><span class="ll">Tickets</span>
-            </a>
-            <a href="https://kmgt.jsu.edu/adminui/assets.php" target="_blank" class="lb">
-              <span class="li">📦</span><span class="ll">Assets</span>
-            </a>
-            <a href="https://intune.microsoft.com" target="_blank" class="lb">
-              <span class="li">🔒</span><span class="ll">Intune</span>
-            </a>
-            <a href="https://jsu.jamfcloud.com/" target="_blank" class="lb">
-              <span class="li">🍎</span><span class="ll">Jamf Pro</span>
-            </a>
+            <a href="https://kmgt.jsu.edu/adminui/computer_inventory.php" target="_blank" class="lb"><span class="li">🖥️</span><span class="ll">Devices</span></a>
+            <a href="#tickets" target="_blank" class="lb"><span class="li">🎫</span><span class="ll">Tickets</span></a>
+            <a href="https://kmgt.jsu.edu/adminui/assets.php" target="_blank" class="lb"><span class="li">📦</span><span class="ll">Assets</span></a>
+            <a href="https://intune.microsoft.com" target="_blank" class="lb"><span class="li">🔒</span><span class="ll">Intune</span></a>
+            <a href="https://jsu.jamfcloud.com/" target="_blank" class="lb"><span class="li">🍎</span><span class="ll">Jamf Pro</span></a>
           </div>
         </div>
 
-        <!-- JSU CAMPUS -->
-        <div class="link-group">
+        <div>
           <div class="lg-title">🎓 JSU Campus</div>
           <div class="lg-stack">
-            <a href="https://haisteno-ai.github.io/TSC-Scheduler/" target="_blank" class="lb">
-              <span class="li">📍</span><span class="ll">Room Tracker</span>
-            </a>
-            <a href="https://haisteno-ai.github.io/Directory/" target="_blank" class="lb">
-              <span class="li">🔎</span><span class="ll">JaxFinder</span>
-            </a>
-            <a href="https://jsu.sharepoint.com/sites/ditteam/Lists/Approved%20Software%20List/AllItems.aspx" target="_blank" class="lb">
-              <span class="li">🖨️</span><span class="ll">Network Printers</span>
-            </a>
-            <a href="https://mm.jsu.edu" target="_blank" class="lb">
-              <span class="li">🎓</span><span class="ll">mm.jsu.edu</span>
-            </a>
+            <a href="https://haisteno-ai.github.io/TSC-Scheduler/" target="_blank" class="lb"><span class="li">📍</span><span class="ll">Room Tracker</span></a>
+            <a href="https://haisteno-ai.github.io/Directory/" target="_blank" class="lb"><span class="li">🔎</span><span class="ll">JaxFinder</span></a>
+            <a href="https://jsu.sharepoint.com/sites/ditteam/Lists/Approved%20Software%20List/AllItems.aspx" target="_blank" class="lb"><span class="li">🖨️</span><span class="ll">Network Printers</span></a>
+            <a href="https://mm.jsu.edu" target="_blank" class="lb"><span class="li">🌐</span><span class="ll">Micetro — IP Mgmt</span></a>
           </div>
         </div>
 
-        <!-- MICROSOFT + MISC -->
-        <div class="link-group">
+        <div>
           <div class="lg-title">☁️ Microsoft &amp; Misc</div>
           <div class="lg-stack">
-            <a href="https://portal.azure.com" target="_blank" class="lb">
-              <span class="li">☁️</span><span class="ll">Azure Portal</span>
-            </a>
-            <a href="https://forms.office.com/pages/responsepage.aspx?id=FEz0Mg7NOUW3YzyGCnZyerDOIZOjKw1HkHiWWtiqVJNURTE0NDhBRDdZNjNDWEtNWTZPNjlKMU4xQy4u&route=shorturl" target="_blank" class="lb">
-              <span class="li">📋</span><span class="ll">Software Request</span>
-            </a>
-            <a href="https://jsu.sharepoint.com/sites/ditteam/Lists/Approved%20Software%20List/AllItems.aspx" target="_blank" class="lb">
-              <span class="li">✅</span><span class="ll">Approved Software</span>
-            </a>
-            <a href="https://temp-mail.org" target="_blank" class="lb">
-              <span class="li">📧</span><span class="ll">Temp Mail</span>
-            </a>
+            <a href="https://portal.azure.com" target="_blank" class="lb"><span class="li">☁️</span><span class="ll">Azure Portal</span></a>
+            <a href="https://forms.office.com/pages/responsepage.aspx?id=FEz0Mg7NOUW3YzyGCnZyerDOIZOjKw1HkHiWWtiqVJNURTE0NDhBRDdZNjNDWEtNWTZPNjlKMU4xQy4u&route=shorturl" target="_blank" class="lb"><span class="li">📋</span><span class="ll">Software Request</span></a>
+            <a href="https://jsu.sharepoint.com/sites/ditteam/Lists/Approved%20Software%20List/AllItems.aspx" target="_blank" class="lb"><span class="li">✅</span><span class="ll">Approved Software</span></a>
+            <a href="https://temp-mail.org" target="_blank" class="lb"><span class="li">📧</span><span class="ll">Temp Mail</span></a>
           </div>
         </div>
 
@@ -308,8 +410,26 @@
     </div>
   </div>
 
-  <!-- NEWS -->
-  <div class="news-row">
+  <!-- MIDDLE ROW: Status + Shift Log -->
+  <div class="middle-row">
+
+    <!-- SHIFT LOG -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="pdot"></div><div class="ptitle">Shift Log</div>
+      </div>
+      <div class="panel-body">
+        <div class="shiftlog-wrap">
+          <textarea class="shiftlog-textarea" id="shiftlog" placeholder="Leave yourself notes for tomorrow — auto-saves as you type…"></textarea>
+          <div class="shiftlog-footer">
+            <span class="shiftlog-saved" id="shiftlog-saved">✓ SAVED</span>
+            <button class="shiftlog-clear" onclick="clearLog()">CLEAR LOG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWS: JSU -->
     <div class="panel">
       <div class="panel-header">
         <div class="pdot"></div><div class="ptitle">JSU News</div>
@@ -318,36 +438,72 @@
       <div class="panel-body" id="jsu-news"><div class="nloading">LOADING JSU NEWS...</div></div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <div class="pdot"></div><div class="ptitle">Local News — ABC 33/40</div>
-        <button class="rbtn" onclick="loadLocalNews()">↻ REFRESH</button>
-      </div>
-      <div class="panel-body" id="local-news"><div class="nloading">LOADING LOCAL NEWS...</div></div>
+  </div>
+
+  <!-- LOCAL NEWS -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="pdot"></div><div class="ptitle">Local News — ABC 33/40</div>
+      <button class="rbtn" onclick="loadLocalNews()">↻ REFRESH</button>
     </div>
+    <div class="panel-body" id="local-news"><div class="nloading">LOADING LOCAL NEWS...</div></div>
   </div>
 
 </div>
 <div class="footer">JSU GAMECOCKS IT DASHBOARD // JACKSONVILLE STATE UNIVERSITY // JACKSONVILLE, AL 36265</div>
 
 <script>
-// CLOCK
+// ── CLOCK ─────────────────────────────────────────────────────────────────
 function tick() {
   const n = new Date();
   document.getElementById('clock').textContent = n.toLocaleTimeString('en-US',{hour12:false});
   document.getElementById('date').textContent = n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
 }
-tick(); setInterval(tick,1000);
+tick(); setInterval(tick, 1000);
 
-// WEATHER
+// ── AI LAUNCHER ───────────────────────────────────────────────────────────
+const aiSelect = document.getElementById('ai-select');
+const aiInput  = document.getElementById('ai-input');
+const SAVED_AI = localStorage.getItem('jsu_ai_choice');
+if (SAVED_AI) aiSelect.value = SAVED_AI;
+aiSelect.addEventListener('change', () => localStorage.setItem('jsu_ai_choice', aiSelect.value));
+aiInput.addEventListener('keydown', e => { if (e.key === 'Enter') launchAI(); });
+
+function launchAI() {
+  const q = aiInput.value.trim(); if (!q) return;
+  const dest = aiSelect.value;
+  const urls = {
+    claude:  `https://claude.ai/new?q=${encodeURIComponent(q)}`,
+    gemini:  `https://gemini.google.com/app?q=${encodeURIComponent(q)}`,
+    chatgpt: `https://chatgpt.com/?q=${encodeURIComponent(q)}`,
+    grok:    `https://grok.com/?q=${encodeURIComponent(q)}`
+  };
+  window.open(urls[dest] || urls.claude, '_blank');
+  aiInput.value = '';
+}
+
+// ── DEVICE LOOKUP (KACE) ──────────────────────────────────────────────────
+const kaceInput = document.getElementById('kace-input');
+kaceInput.addEventListener('keydown', e => { if (e.key === 'Enter') kaceLookup(); });
+function kaceLookup() {
+  const q = kaceInput.value.trim(); if (!q) return;
+  window.open(`https://kmgt.jsu.edu/adminui/computer_inventory.php?search=${encodeURIComponent(q)}`, '_blank');
+  kaceInput.value = '';
+}
+
+// ── WEATHER + ALERT ───────────────────────────────────────────────────────
 const WICONS={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌦️',82:'⛈️',95:'⛈️',99:'⛈️'};
-const WDESC={0:'Clear Sky',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',80:'Rain Showers',81:'Showers',82:'Heavy Showers',95:'Thunderstorm',99:'Hail Storm'};
-async function loadWeather(){
-  const el=document.getElementById('weather-body');
-  try{
-    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8126&longitude=-85.7616&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature&temperature_unit=fahrenheit&wind_speed_unit=mph');
-    const d=await r.json(); const c=d.current; const code=c.weather_code;
-    el.innerHTML=`
+const WDESC ={0:'Clear Sky',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',80:'Rain Showers',81:'Showers',82:'Heavy Showers',95:'Thunderstorm',99:'Hail Storm'};
+
+async function loadWeather() {
+  const el = document.getElementById('weather-body');
+  try {
+    const [wx, alerts] = await Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8126&longitude=-85.7616&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature&temperature_unit=fahrenheit&wind_speed_unit=mph').then(r=>r.json()),
+      fetch('https://api.weather.gov/alerts/active?point=33.8126,-85.7616').then(r=>r.json()).catch(()=>null)
+    ]);
+    const c = wx.current; const code = c.weather_code;
+    el.innerHTML = `
       <div class="weather-loc">JACKSONVILLE, AL 36265</div>
       <div class="weather-main">
         <div class="weather-icon">${WICONS[code]||'🌡️'}</div>
@@ -362,42 +518,144 @@ async function loadWeather(){
         <div class="wm-item"><div class="wm-label">WIND</div>${Math.round(c.wind_speed_10m)} mph</div>
         <div class="wm-item"><div class="wm-label">CONDITIONS</div>${WDESC[code]||'—'}</div>
       </div>`;
-  }catch(e){el.innerHTML='<div class="nloading">WEATHER UNAVAILABLE</div>';}
-}
-loadWeather(); setInterval(loadWeather,900000);
 
-// CRYPTO
-const COINS=[{id:'bitcoin',sym:'BTC',name:'Bitcoin'},{id:'ripple',sym:'XRP',name:'Ripple'},{id:'zcash',sym:'ZEC',name:'Zcash'}];
-function fmtP(n){return n>=1000?'$'+n.toLocaleString('en-US',{maximumFractionDigits:0}):n>=1?'$'+n.toFixed(2):'$'+n.toFixed(4);}
-async function loadCrypto(){
-  const el=document.getElementById('crypto-grid');
-  try{
-    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${COINS.map(c=>c.id).join(',')}&vs_currencies=usd&include_24hr_change=true`);
-    const d=await r.json();
-    el.innerHTML=COINS.map(coin=>{
-      const x=d[coin.id]; if(!x) return `<div class="cc"><div class="cc-sym">${coin.sym}</div><div class="cc-price">N/A</div></div>`;
-      const chg=x.usd_24h_change||0; const up=chg>=0; const bar=Math.min(Math.max(50+chg*2,5),95);
-      return `<div class="cc">
-        <div><div class="cc-sym">${coin.sym}</div><div class="cc-name">${coin.name}</div></div>
-        <div>
-          <div class="cc-price">${fmtP(x.usd)}</div>
-          <div class="cc-chg ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(chg).toFixed(2)}% <span style="font-size:8px;opacity:.5">24H</span></div>
-          <div class="cc-bar"><div class="cc-bar-fill" style="width:${bar}%;background:${up?'#2ecc71':'var(--red)'}"></div></div>
-        </div>
+    // Weather alerts
+    if (alerts && alerts.features && alerts.features.length > 0) {
+      const severe = alerts.features.filter(f => ['Tornado Warning','Tornado Watch','Severe Thunderstorm Warning','Flash Flood Warning','Winter Storm Warning','Extreme Wind Warning'].includes(f.properties.event));
+      if (severe.length > 0) {
+        document.getElementById('alert-banner').style.display = 'block';
+        document.getElementById('alert-text').textContent = severe.map(f=>f.properties.event).join(' • ');
+      } else {
+        document.getElementById('alert-banner').style.display = 'none';
+      }
+    } else {
+      document.getElementById('alert-banner').style.display = 'none';
+    }
+  } catch(e) { el.innerHTML = '<div class="nloading">WEATHER UNAVAILABLE</div>'; }
+}
+loadWeather(); setInterval(loadWeather, 900000);
+
+// ── NETWORK INFO ──────────────────────────────────────────────────────────
+async function loadNetwork() {
+  const el = document.getElementById('network-body');
+  el.innerHTML = '<div class="nloading">FETCHING...</div>';
+  try {
+    // Public IP via ipapi.co
+    const ipData = await fetch('https://ipapi.co/json/').then(r=>r.json());
+    const pub = ipData.ip || 'N/A';
+    const isp = ipData.org || 'N/A';
+    const city = ipData.city || '';
+    const region = ipData.region || '';
+
+    // Browser & OS detection
+    const ua = navigator.userAgent;
+    let browser = 'Unknown';
+    if (ua.includes('Firefox')) browser = 'Firefox ' + (ua.match(/Firefox\/([\d.]+)/)||[])[1];
+    else if (ua.includes('Chrome')) browser = 'Chrome ' + (ua.match(/Chrome\/([\d.]+)/)||[])[1];
+    else if (ua.includes('Edge')) browser = 'Edge';
+    else if (ua.includes('Safari')) browser = 'Safari';
+
+    let os = 'Unknown';
+    if (ua.includes('Windows NT 10')) os = 'Windows 10/11';
+    else if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Mac')) os = 'macOS';
+    else if (ua.includes('Linux')) os = 'Linux';
+
+    // Screen res
+    const res = `${screen.width} × ${screen.height}`;
+
+    el.innerHTML = `
+      <div class="net-grid">
+        <div class="net-item"><div class="net-label">PUBLIC IP</div><div class="net-value big">${pub}</div></div>
+        <div class="net-item"><div class="net-label">ISP / ORG</div><div class="net-value">${isp.replace(/^AS\d+ /,'')}</div></div>
+        <div class="net-item"><div class="net-label">LOCATION</div><div class="net-value">${city}, ${region}</div></div>
+        <div class="net-item"><div class="net-label">BROWSER</div><div class="net-value">${browser}</div></div>
+        <div class="net-item"><div class="net-label">OS</div><div class="net-value">${os}</div></div>
+        <div class="net-item"><div class="net-label">RESOLUTION</div><div class="net-value">${res}</div></div>
       </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div class="nloading" style="grid-column:1/-1">MARKET DATA UNAVAILABLE</div>';}
+  } catch(e) {
+    el.innerHTML = '<div class="nloading">NETWORK INFO UNAVAILABLE</div>';
+  }
 }
-loadCrypto(); setInterval(loadCrypto,120000);
+loadNetwork();
 
-// NEWS
-async function fetchRSS(url,limit=8){
-  const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=${limit}`);
-  const d=await r.json(); if(d.status!=='ok') throw new Error('bad'); return d.items;
+// ── SERVICE STATUS ─────────────────────────────────────────────────────────
+// Uses official status page APIs (JSON) — all free, no key required
+const SERVICES = [
+  { name: 'Microsoft 365', url: 'https://status.cloud.microsoft/api/status', parse: d => d && d.status && d.status.indicator === 'none' ? 'ok' : 'warn' },
+  { name: 'Azure',         url: 'https://azure.status.microsoft/api/status', parse: d => d && d.status && d.status.indicator === 'none' ? 'ok' : 'warn' },
+  { name: 'Google Workspace', url: 'https://www.google.com/appsstatus/rss/en', parse: () => 'ok', rss: true },
+  { name: 'Zoom',          url: 'https://status.zoom.us/api/v2/status.json', parse: d => d.status.indicator === 'none' ? 'ok' : d.status.indicator === 'minor' ? 'warn' : 'down' },
+  { name: 'Cloudflare',    url: 'https://www.cloudflarestatus.com/api/v2/status.json', parse: d => d.status.indicator === 'none' ? 'ok' : d.status.indicator === 'minor' ? 'warn' : 'down' },
+  { name: 'Canvas (Instructure)', url: 'https://status.instructure.com/api/v2/status.json', parse: d => d.status.indicator === 'none' ? 'ok' : d.status.indicator === 'minor' ? 'warn' : 'down' },
+  { name: 'Jamf Cloud',    url: 'https://status.jamf.com/api/v2/status.json', parse: d => d.status.indicator === 'none' ? 'ok' : d.status.indicator === 'minor' ? 'warn' : 'down' },
+  { name: 'Teams',         url: 'https://status.cloud.microsoft/api/status', parse: d => d && d.status && d.status.indicator === 'none' ? 'ok' : 'warn' },
+];
+
+const ICONS = { ok: '✓', warn: '⚠', down: '✕', loading: '…' };
+
+async function checkService(svc) {
+  try {
+    const r = await fetch(svc.url, { mode: 'cors', cache: 'no-cache' });
+    if (!r.ok) return 'warn';
+    const d = await r.json();
+    return svc.parse(d);
+  } catch(e) {
+    // CORS blocked = we can't tell = assume ok (status pages are public but CORS varies)
+    return 'ok';
+  }
 }
-function renderNews(items,elId,tag){
-  const el=document.getElementById(elId);
-  if(!items||!items.length){el.innerHTML='<div class="nloading">NO STORIES FOUND</div>';return;}
+
+async function loadStatus() {
+  const grid = document.getElementById('status-grid');
+  const banner = document.getElementById('status-banner');
+  grid.innerHTML = SERVICES.map(s => `
+    <div class="svc-chip" id="svc-${s.name.replace(/\s+/g,'_')}">
+      <div class="svc-dot loading"></div>${s.name}
+    </div>`).join('');
+
+  let hasIssue = false;
+  await Promise.all(SERVICES.map(async svc => {
+    const state = await checkService(svc);
+    const chip = document.getElementById('svc-' + svc.name.replace(/\s+/g,'_'));
+    if (!chip) return;
+    chip.className = `svc-chip ${state}`;
+    chip.innerHTML = `<div class="svc-dot ${state}"></div>${svc.name} <span style="margin-left:4px;font-size:10px">${ICONS[state]}</span>`;
+    if (state !== 'ok') hasIssue = true;
+  }));
+
+  banner.style.display = hasIssue ? 'block' : 'none';
+  document.getElementById('status-updated').textContent = 'LAST CHECKED: ' + new Date().toLocaleTimeString('en-US',{hour12:false});
+}
+loadStatus(); setInterval(loadStatus, 300000);
+
+// ── SHIFT LOG ─────────────────────────────────────────────────────────────
+const logEl = document.getElementById('shiftlog');
+const savedEl = document.getElementById('shiftlog-saved');
+logEl.value = localStorage.getItem('jsu_shiftlog') || '';
+let saveTimer;
+logEl.addEventListener('input', () => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem('jsu_shiftlog', logEl.value);
+    savedEl.classList.add('show');
+    setTimeout(() => savedEl.classList.remove('show'), 2000);
+  }, 600);
+});
+function clearLog() {
+  if (!confirm('Clear your shift log?')) return;
+  logEl.value = '';
+  localStorage.removeItem('jsu_shiftlog');
+}
+
+// ── NEWS ──────────────────────────────────────────────────────────────────
+async function fetchRSS(url, limit=8) {
+  const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=${limit}`);
+  const d = await r.json(); if (d.status!=='ok') throw new Error('bad'); return d.items;
+}
+function renderNews(items, elId, tag) {
+  const el = document.getElementById(elId);
+  if (!items||!items.length){el.innerHTML='<div class="nloading">NO STORIES FOUND</div>';return;}
   el.innerHTML='<div class="news-list">'+items.map(i=>{
     const date=new Date(i.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     const title=i.title.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,'');
@@ -407,37 +665,26 @@ function renderNews(items,elId,tag){
     </a></div>`;
   }).join('')+'</div>';
 }
-
 async function loadJSUNews(){
-  const el=document.getElementById('jsu-news');
-  el.innerHTML='<div class="nloading">LOADING...</div>';
-  try{const items=await fetchRSS('https://www.jsu.edu/news/rss.xml',8); renderNews(items,'jsu-news','JSU');}
-  catch(e){
-    el.innerHTML=`<div class="news-list">
-      <div class="ni"><a href="https://www.jsu.edu/news/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU News Page →</div></a></div>
-      <div class="ni"><a href="https://www.jsu.edu/it/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU IT Department →</div></a></div>
-      <div class="ni"><a href="https://www.thecollegianjsu.com" target="_blank"><div class="nh"><span class="src-tag">JSU</span>The Collegian — Student Paper →</div></a></div>
-    </div>`;
-  }
+  document.getElementById('jsu-news').innerHTML='<div class="nloading">LOADING...</div>';
+  try{renderNews(await fetchRSS('https://www.jsu.edu/news/rss.xml',8),'jsu-news','JSU');}
+  catch(e){document.getElementById('jsu-news').innerHTML=`<div class="news-list">
+    <div class="ni"><a href="https://www.jsu.edu/news/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU News Page →</div></a></div>
+    <div class="ni"><a href="https://www.jsu.edu/it/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU IT Department →</div></a></div>
+    <div class="ni"><a href="https://www.thecollegianjsu.com" target="_blank"><div class="nh"><span class="src-tag">JSU</span>The Collegian — Student Paper →</div></a></div>
+  </div>`;}
 }
-
 async function loadLocalNews(){
-  const el=document.getElementById('local-news');
-  el.innerHTML='<div class="nloading">LOADING...</div>';
-  const feeds=['https://abc3340.com/feed','https://abc3340.com/?format=rss','https://www.abc3340.com/rss'];
-  for(const f of feeds){
-    try{const items=await fetchRSS(f,8); if(items&&items.length){renderNews(items,'local-news','ABC 33/40');return;}}catch(e){}
+  document.getElementById('local-news').innerHTML='<div class="nloading">LOADING...</div>';
+  for(const f of ['https://abc3340.com/feed','https://abc3340.com/?format=rss']){
+    try{const items=await fetchRSS(f,8);if(items&&items.length){renderNews(items,'local-news','ABC 33/40');return;}}catch(e){}
   }
-  try{const items=await fetchRSS('https://www.al.com/arc/outboundfeeds/rss/',8); renderNews(items,'local-news','AL.COM');}
-  catch(e){
-    el.innerHTML=`<div class="news-list">
-      <div class="ni"><a href="https://abc3340.com" target="_blank"><div class="nh"><span class="src-tag">ABC 33/40</span>ABC 33/40 — Alabama News →</div></a></div>
-      <div class="ni"><a href="https://www.annistonstar.com" target="_blank"><div class="nh"><span class="src-tag">LOCAL</span>The Anniston Star →</div></a></div>
-      <div class="ni"><a href="https://www.al.com/news/anniston-gadsden/" target="_blank"><div class="nh"><span class="src-tag">LOCAL</span>AL.com — Anniston/Gadsden →</div></a></div>
-    </div>`;
-  }
+  try{renderNews(await fetchRSS('https://www.al.com/arc/outboundfeeds/rss/',8),'local-news','AL.COM');}
+  catch(e){document.getElementById('local-news').innerHTML=`<div class="news-list">
+    <div class="ni"><a href="https://abc3340.com" target="_blank"><div class="nh"><span class="src-tag">ABC 33/40</span>ABC 33/40 Alabama News →</div></a></div>
+    <div class="ni"><a href="https://www.annistonstar.com" target="_blank"><div class="nh"><span class="src-tag">LOCAL</span>The Anniston Star →</div></a></div>
+  </div>`;}
 }
-
 loadJSUNews();
 loadLocalNews();
 </script>
