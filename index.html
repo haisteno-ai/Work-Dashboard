@@ -163,13 +163,13 @@ body{
   <div class="header-brand">
     <div class="rooster">&#x1F413;</div>
     <div>
-      <div class="brand-title">JSU Gamecocks IT</div>
+      <div class="brand-title">JAX State Department of Information Technology</div>
       <div class="brand-sub">JACKSONVILLE STATE UNIVERSITY // INFORMATION TECHNOLOGY</div>
     </div>
   </div>
   <div class="hdr-mid">
-    <a href="mailto:support@jsu.edu" class="support-btn">&#x2709;&#xFE0F;&nbsp; EMAIL IT SUPPORT</a>
-    <a href="https://kmgt.jsu.edu/adminui/ticket.php?QUEUE_ID=18" target="_blank" class="support-btn" style="background:rgba(212,22,60,.18);border-color:rgba(212,22,60,.6);">&#x1F3AB;&nbsp; NEW 0 QUEUE TICKET</a>
+    <a href="/cdn-cgi/l/email-protection#c7b4b2b7b7a8b5b387adb4b2e9a2a3b2" class="support-btn">&#x2709;&#xFE0F;&nbsp; EMAIL IT SUPPORT</a>
+    <a href="https://kmgt.jsu.edu/adminui/ticket.php?QUEUE_ID=18" target="_blank" class="support-btn" style="background:rgba(212,22,60,.18);border-color:rgba(212,22,60,.6);">&#x1F3AB;&nbsp; NEW ZERO QUEUE TICKET</a>
     <div class="ios-wrap">
       <span class="ios-label" id="theme-lbl">DARK</span>
       <label class="ios-toggle">
@@ -292,19 +292,32 @@ body{
       </div>
     </div>
     <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">JSU News</div><button class="rbtn" id="jsu-refresh">&#x21BB; REFRESH</button></div>
-      <div class="pb" id="jsu-news"><div class="nloading">LOADING JSU NEWS&hellip;</div></div>
+      <div class="ph">
+        <div class="pdot"></div>
+        <div class="ptitle">News Feeds</div>
+        <button class="rbtn" id="news-toggle-btn" onclick="toggleNewsConfig()" style="margin-left:auto;">&#9881; MANAGE FEEDS</button>
+      </div>
+      <!-- Feed Manager (hidden by default) -->
+      <div id="news-config" style="display:none;padding:12px;border-bottom:1px solid var(--bs);">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:8px;">RSS FEED URLS — ONE PER LINE</div>
+        <textarea id="feed-input" style="width:100%;min-height:80px;resize:vertical;background:var(--bg4);border:1px solid var(--bs);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 10px;border-radius:7px;outline:none;line-height:1.7;" placeholder="https://example.com/rss&#10;https://another.com/feed"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="saveFeeds()" style="background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer;">SAVE &amp; RELOAD</button>
+          <button onclick="resetFeeds()" style="background:none;border:1px solid var(--bs);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 12px;border-radius:6px;cursor:pointer;letter-spacing:1px;">RESET DEFAULTS</button>
+        </div>
+      </div>
+      <div class="pb" id="jsu-news"><div class="nloading">LOADING NEWS&hellip;</div></div>
     </div>
   </div>
 
 </div>
 
 <!-- NEWS TICKER -->
-<div class="ticker-bar">
+<div class="ticker-bar" id="ticker-bar">
   <div class="ticker-label">
     <span>NEWS</span>
     <div class="ticker-divider"></div>
-    <span>LIVE</span>
+    <button onclick="toggleTicker()" id="ticker-toggle-btn" style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;cursor:pointer;letter-spacing:1px;">HIDE</button>
   </div>
   <div class="ticker-wrap">
     <div class="ticker-track" id="ticker-track">
@@ -315,7 +328,7 @@ body{
 
 <div class="footer">JSU GAMECOCKS IT DASHBOARD // JACKSONVILLE STATE UNIVERSITY // JACKSONVILLE, AL 36265</div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (function(){
 'use strict';
 
@@ -507,67 +520,152 @@ function cleanTitle(t){
   return t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,'').trim();
 }
 
-// JSU NEWS PANEL
-function renderNews(items,elId,tag){
+// NEWS FEEDS — CONFIGURABLE
+var DEFAULT_FEED_URLS=[
+  'https://www.jsu.edu/news/rss.xml',
+  'https://www.jsuchanticleer.com/feed/',
+  'https://abc3340.com/feed'
+];
+
+function getSavedFeeds(){
+  try{
+    var s=localStorage.getItem('jsu_feeds');
+    if(s){var arr=JSON.parse(s);if(arr&&arr.length)return arr;}
+  }catch(e){}
+  return DEFAULT_FEED_URLS;
+}
+
+function getTagForUrl(url){
+  if(url.indexOf('jsu.edu')>-1)return 'JSU';
+  if(url.indexOf('jsuchanticleer')>-1)return 'CHANTICLEER';
+  if(url.indexOf('abc3340')>-1)return 'ABC 33/40';
+  try{return new URL(url).hostname.replace('www.','').split('.')[0].toUpperCase();}
+  catch(e){return 'NEWS';}
+}
+
+function toggleNewsConfig(){
+  var cfg=document.getElementById('news-config');
+  var inp=document.getElementById('feed-input');
+  if(cfg.style.display==='none'||cfg.style.display===''){
+    cfg.style.display='block';
+    inp.value=getSavedFeeds().join('\n');
+  }else{
+    cfg.style.display='none';
+  }
+}
+
+function saveFeeds(){
+  var inp=document.getElementById('feed-input');
+  var lines=inp.value.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  if(!lines.length){alert('Please enter at least one RSS feed URL.');return;}
+  localStorage.setItem('jsu_feeds',JSON.stringify(lines));
+  document.getElementById('news-config').style.display='none';
+  loadNewsPanel();
+  loadTicker();
+}
+
+function resetFeeds(){
+  localStorage.removeItem('jsu_feeds');
+  document.getElementById('news-config').style.display='none';
+  loadNewsPanel();
+  loadTicker();
+}
+
+function renderNews(items,elId){
   var el=document.getElementById(elId);
   if(!items||!items.length){el.innerHTML='<div class="nloading">NO STORIES FOUND</div>';return;}
   el.innerHTML='<div class="news-list">'+items.map(function(i){
-    var date=new Date(i.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    var title=cleanTitle(i.title);
+    var date=i.pubDate?new Date(i.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
     return '<div class="ni"><a href="'+i.link+'" target="_blank">'
-      +'<div class="nh"><span class="src-tag">'+tag+'</span>'+title+'</div>'
+      +'<div class="nh"><span class="src-tag">'+i.tag+'</span>'+i.title+'</div>'
       +'<div class="nm">'+date+'</div>'
       +'</a></div>';
   }).join('')+'</div>';
 }
-function loadJSUNews(){
+
+function loadNewsPanel(){
   var el=document.getElementById('jsu-news');
   el.innerHTML='<div class="nloading">LOADING...</div>';
-  fetchRSS('https://www.jsu.edu/news/rss.xml',7)
-  .then(function(items){renderNews(items,'jsu-news','JSU');})
-  .catch(function(){
-    el.innerHTML='<div class="news-list">'
-      +'<div class="ni"><a href="https://www.jsu.edu/news/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU News Page</div></a></div>'
-      +'<div class="ni"><a href="https://www.jsuchanticleer.com" target="_blank"><div class="nh"><span class="src-tag">JSU</span>The Chanticleer</div></a></div>'
-      +'<div class="ni"><a href="https://www.jsu.edu/it/" target="_blank"><div class="nh"><span class="src-tag">JSU</span>JSU IT Department</div></a></div>'
-      +'</div>';
-  });
-}
-loadJSUNews();
-document.getElementById('jsu-refresh').addEventListener('click',loadJSUNews);
-
-// TICKER
-function loadTicker(){
-  var track=document.getElementById('ticker-track');
+  var urls=getSavedFeeds();
   var allItems=[];
-  var feeds=[
-    {url:'https://www.jsu.edu/news/rss.xml',tag:'JSU',limit:5},
-    {url:'https://www.jsuchanticleer.com/feed/',tag:'CHANTICLEER',limit:4},
-    {url:'https://abc3340.com/feed',tag:'ABC 33/40',limit:5}
-  ];
-  var promises=feeds.map(function(f){
-    return fetchRSS(f.url,f.limit)
+  var promises=urls.map(function(url){
+    var tag=getTagForUrl(url);
+    return fetchRSS(url,5)
     .then(function(items){
       items.forEach(function(i){
-        allItems.push({title:cleanTitle(i.title),link:i.link,tag:f.tag});
+        allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag,pubDate:i.pubDate});
       });
     })
     .catch(function(){});
   });
   Promise.all(promises).then(function(){
     if(!allItems.length){
-      allItems=[
-        {title:'JSU Gamecocks IT Dashboard',link:'https://www.jsu.edu/news/',tag:'JSU'},
-        {title:'Visit abc3340.com for local Alabama news',link:'https://abc3340.com',tag:'ABC 33/40'}
-      ];
+      el.innerHTML='<div class="nloading">No stories found. Try updating your feed URLs.</div>';
+      return;
+    }
+    allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate);});
+    renderNews(allItems.slice(0,10),'jsu-news');
+  });
+}
+loadNewsPanel();
+
+// TICKER TOGGLE
+var tickerVisible=(localStorage.getItem('jsu_ticker')!=='hidden');
+function applyTickerState(){
+  var bar=document.getElementById('ticker-bar');
+  var btn=document.getElementById('ticker-toggle-btn');
+  if(tickerVisible){
+    bar.style.height='36px';
+    bar.style.borderTopWidth='1px';
+    bar.style.overflow='hidden';
+    btn.textContent='HIDE';
+  }else{
+    bar.style.height='0px';
+    bar.style.borderTopWidth='0px';
+    btn.textContent='SHOW';
+  }
+}
+function toggleTicker(){
+  tickerVisible=!tickerVisible;
+  localStorage.setItem('jsu_ticker',tickerVisible?'visible':'hidden');
+  applyTickerState();
+}
+applyTickerState();
+
+function loadTicker(){
+  var track=document.getElementById('ticker-track');
+  var urls=getSavedFeeds();
+  var allItems=[];
+  var promises=urls.map(function(url){
+    var tag=getTagForUrl(url);
+    return fetchRSS(url,5)
+    .then(function(items){
+      items.forEach(function(i){
+        allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag});
+      });
+    })
+    .catch(function(){});
+  });
+  Promise.all(promises).then(function(){
+    if(!allItems.length){
+      allItems=[{title:'Add RSS feeds via the Manage Feeds button in the News panel',link:'#',tag:'INFO'}];
     }
     var doubled=allItems.concat(allItems);
     var html=doubled.map(function(i){
       return '<a class="ticker-item" href="'+i.link+'" target="_blank">'
         +'<span class="ticker-badge">'+i.tag+'</span>'
         +i.title
-        +'</a>'
-        +'<span class="ticker-sep">&#x25CF;</span>';
+        +'</a><span class="ticker-sep">&#x25CF;</span>';
     }).join('');
     track.innerHTML=html;
-    var speed=Math.max(45,double
+    var speed=Math.max(45,doubled.length*4);
+    track.style.animationDuration=speed+'s';
+  });
+}
+loadTicker();
+setInterval(loadTicker,1200000);
+
+})();
+</script>
+</body>
+</html>
