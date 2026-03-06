@@ -328,7 +328,7 @@ body{
     </div>
   </div>
   <div class="hdr-mid">
-    <a href="mailto:support@jsu.edu" class="support-btn">✉️&nbsp; EMAIL IT SUPPORT</a>
+    <a href="/cdn-cgi/l/email-protection#3d4e484d4d524f497d574e4813585948" class="support-btn">✉️&nbsp; EMAIL IT SUPPORT</a>
     <div class="ios-wrap">
       <span class="ios-label" id="theme-lbl">DARK</span>
       <label class="ios-toggle">
@@ -396,33 +396,22 @@ body{
     </div>
   </div>
 
-  <!-- 2. TOOLS ROW -->
-  <div class="tools-row">
-    <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">Device Lookup — KACE</div></div>
-      <div class="pb">
-        <div class="lookup-wrap">
-          <input class="lookup-input" id="kace-input" type="text" placeholder="Hostname, asset tag, username…"/>
-          <button class="lookup-go" onclick="kaceLookup()">🔍 SEARCH</button>
+  <!-- 2. AI LAUNCHER -->
+  <div class="panel">
+    <div class="ph"><div class="pdot"></div><div class="ptitle">AI Launcher</div></div>
+    <div class="pb">
+      <div class="ai-launcher">
+        <div class="ai-sel-wrap">
+          <select class="ai-sel" id="ai-sel">
+            <option value="claude">🧠 Claude</option>
+            <option value="gemini">♊ Gemini</option>
+            <option value="chatgpt">💬 ChatGPT</option>
+            <option value="grok">⚡ Grok</option>
+          </select>
+          <span class="ai-arrow">▾</span>
         </div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">AI Launcher</div></div>
-      <div class="pb">
-        <div class="ai-launcher">
-          <div class="ai-sel-wrap">
-            <select class="ai-sel" id="ai-sel">
-              <option value="claude">🧠 Claude</option>
-              <option value="gemini">♊ Gemini</option>
-              <option value="chatgpt">💬 ChatGPT</option>
-              <option value="grok">⚡ Grok</option>
-            </select>
-            <span class="ai-arrow">▾</span>
-          </div>
-          <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything — Enter to open in new tab…"/>
-          <button class="ai-go" onclick="launchAI()">ASK →</button>
-        </div>
+        <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything — Enter to open in new tab…"/>
+        <button class="ai-go" onclick="launchAI()">ASK →</button>
       </div>
     </div>
   </div>
@@ -485,7 +474,7 @@ body{
 
 <div class="footer">JSU GAMECOCKS IT DASHBOARD // JACKSONVILLE STATE UNIVERSITY // JACKSONVILLE, AL 36265</div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── CLOCK ────────────────────────────────────────────────────────
 function tick(){
   const n=new Date();
@@ -526,14 +515,7 @@ function launchAI(){
   aiInp.value='';
 }
 
-// ── DEVICE LOOKUP ────────────────────────────────────────────────
-const kaceInp=document.getElementById('kace-input');
-kaceInp.addEventListener('keydown',e=>{if(e.key==='Enter')kaceLookup();});
-function kaceLookup(){
-  const q=kaceInp.value.trim();if(!q)return;
-  window.open(`https://kmgt.jsu.edu/adminui/computer_inventory.php?search=${encodeURIComponent(q)}`,'_blank');
-  kaceInp.value='';
-}
+
 
 // ── WEATHER ──────────────────────────────────────────────────────
 const WI={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌦️',82:'⛈️',95:'⛈️',99:'⛈️'};
@@ -718,11 +700,4 @@ async function loadTicker(){
 
   // Adjust animation speed based on content length
   const speed=Math.max(40,all.length*5);
-  track.style.animationDuration=speed+'s';
-}
-loadTicker();
-// Refresh ticker every 20 minutes
-setInterval(loadTicker,1200000);
-</script>
-</body>
-</html>
+  track
