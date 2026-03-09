@@ -303,7 +303,7 @@ body{
 
   <!-- 5. DINING HALL / CAFE MENUS — FEATURE #3 -->
   <div class="panel">
-    <div class="ph"><div class="pdot"></div><div class="ptitle">Dining Hall / Cafe Menus</div></div>
+    <div class="ph"><div class="pdot"></div><div class="ptitle"><a href="https://jsudining.sodexomyway.com/en-us/locations/dining-hall" target="_blank" style="color:inherit;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='inherit'">JAX State Dining Hall &#x2197;</a></div></div>
     <div class="pb">
       <div class="cafe-period-indicator" id="cafe-period-indicator" style="margin-bottom:10px;">
         <div class="cafe-period-dot"></div>
@@ -861,7 +861,7 @@ setInterval(loadTicker,1200000);
 
   // Jack Hopper Dining Hall menu data
   var JACK_HOPPER={
-    name:'Jack Hopper Dining Hall',
+    name:'JAX State Dining Hall',
     icon:'🍽️',
     meals:{
       'Breakfast':  [{station:'Grill',items:['Scrambled Eggs','Bacon','Sausage Patty','Hash Browns','Pancakes']},{station:'Bakery',items:['Biscuits & Gravy','Muffins','Toast','Fruit Cup']},{station:'Beverages',items:['Coffee','Orange Juice','Milk','Hot Tea']}],
@@ -919,7 +919,6 @@ setInterval(loadTicker,1200000);
       stationsHTML='<div class="nloading" style="padding:12px 0;">No menu data for this period</div>';
     }
     row.innerHTML='<div class="cafe-card" style="grid-column:1/-1;">'
-      +'<div class="cafe-card-header"><div class="cafe-card-title">'+loc.icon+' '+loc.name+'</div><div class="cafe-meal-badge">'+meal+'</div></div>'
       +'<div class="cafe-card-body">'+stationsHTML+'</div>'
       +'</div>';
   }
