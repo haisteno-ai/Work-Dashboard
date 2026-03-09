@@ -667,9 +667,7 @@ function cleanTitle(t){
 
 // NEWS FEEDS — CONFIGURABLE
 var DEFAULT_FEED_URLS=[
-  'https://www.jsu.edu/news/rss.xml',
-  'https://www.jsuchanticleer.com/feed/',
-  'https://abc3340.com/feed'
+  'https://www.annistonstar.com/search/?f=rss&t=article&l=25&s=start_time&sd=desc'
 ];
 
 function getSavedFeeds(){
@@ -681,9 +679,7 @@ function getSavedFeeds(){
 }
 
 function getTagForUrl(url){
-  if(url.indexOf('jsu.edu')>-1)return 'JSU';
-  if(url.indexOf('jsuchanticleer')>-1)return 'CHANTICLEER';
-  if(url.indexOf('abc3340')>-1)return 'ABC 33/40';
+  if(url.indexOf('annistonstar')>-1)return 'ANNISTON STAR';
   try{return new URL(url).hostname.replace('www.','').split('.')[0].toUpperCase();}
   catch(e){return 'NEWS';}
 }
