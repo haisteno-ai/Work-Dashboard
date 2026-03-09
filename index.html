@@ -153,6 +153,27 @@ body{
 .ticker-badge{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 5px;border-radius:2px;background:rgba(212,22,60,.14);color:var(--red);border:1px solid rgba(212,22,60,.27);letter-spacing:1px;flex-shrink:0;}
 .ticker-sep{color:var(--red);opacity:.4;padding:0 4px;font-size:16px;}
 .footer{text-align:center;padding:7px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);opacity:.25;letter-spacing:2px;flex-shrink:0;}
+
+/* ===== CAFE MENU CARD STYLES ===== */
+.cafe-card{background:var(--bg3);border:1px solid var(--bs);border-radius:9px;overflow:hidden;transition:all .3s;}
+.cafe-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-bottom:1px solid var(--bs);}
+.cafe-card-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text);}
+.cafe-meal-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(212,22,60,.14);color:var(--red);border:1px solid rgba(212,22,60,.3);letter-spacing:1px;text-transform:uppercase;}
+.cafe-card-body{padding:12px 14px;min-height:120px;}
+.cafe-station{margin-bottom:10px;}
+.cafe-station:last-child{margin-bottom:0;}
+.cafe-station-name{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:4px;text-transform:uppercase;}
+.cafe-items{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;color:var(--text);line-height:1.6;}
+.cafe-item{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg4);border-radius:4px;margin:2px 3px 2px 0;font-size:12px;transition:background .15s;}
+.cafe-card-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--bs);background:var(--bg4);}
+.cafe-nav-btn{background:none;border:1px solid var(--bs);color:var(--muted);border-radius:5px;padding:4px 12px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:1px;display:flex;align-items:center;gap:4px;}
+.cafe-nav-btn:hover:not(:disabled){border-color:var(--red);color:var(--red);background:rgba(212,22,60,.06);}
+.cafe-nav-btn:disabled{opacity:.3;cursor:default;}
+.cafe-counter{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;}
+.cafe-period-indicator{display:flex;align-items:center;gap:6px;}
+.cafe-period-dot{width:6px;height:6px;border-radius:50%;background:#2ecc71;box-shadow:0 0 5px #2ecc71;animation:blink 2s infinite;}
+.cafe-period-text{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2ecc71;letter-spacing:1px;}
+.cafe-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
 </style>
 </head>
 <body>
@@ -168,7 +189,8 @@ body{
     </div>
   </div>
   <div class="hdr-mid">
-    <a href="/cdn-cgi/l/email-protection#c7b4b2b7b7a8b5b387adb4b2e9a2a3b2" class="support-btn">&#x2709;&#xFE0F;&nbsp; EMAIL IT SUPPORT</a>
+    <!-- FIX #1: mailto link instead of dead Cloudflare-encoded href -->
+    <a href="mailto:support@jsu.edu?subject=IT%20Support%20Request" class="support-btn">&#x2709;&#xFE0F;&nbsp; EMAIL IT SUPPORT</a>
     <a href="https://kmgt.jsu.edu/adminui/ticket.php?QUEUE_ID=18" target="_blank" class="support-btn" style="background:rgba(212,22,60,.18);border-color:rgba(212,22,60,.6);">&#x1F3AB;&nbsp; NEW ZERO QUEUE TICKET</a>
     <div class="ios-wrap">
       <span class="ios-label" id="theme-lbl">DARK</span>
@@ -279,7 +301,21 @@ body{
     </div>
   </div>
 
-  <!-- 5. SHIFT LOG + JSU NEWS -->
+  <!-- 5. DINING HALL / CAFE MENUS — FEATURE #3 -->
+  <div class="panel">
+    <div class="ph"><div class="pdot"></div><div class="ptitle">Dining Hall / Cafe Menus</div></div>
+    <div class="pb">
+      <div class="cafe-period-indicator" id="cafe-period-indicator" style="margin-bottom:10px;">
+        <div class="cafe-period-dot"></div>
+        <span class="cafe-period-text" id="cafe-period-text">NOW SERVING: ---</span>
+      </div>
+      <div class="cafe-row" id="cafe-row">
+        <div class="nloading" id="cafe-loading">LOADING MENUS&hellip;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SHIFT LOG + JSU NEWS -->
   <div class="shift-row">
     <div class="panel">
       <div class="ph"><div class="pdot"></div><div class="ptitle">Shift Log</div></div>
@@ -295,15 +331,15 @@ body{
       <div class="ph">
         <div class="pdot"></div>
         <div class="ptitle">News Feeds</div>
-        <button class="rbtn" id="news-toggle-btn" onclick="toggleNewsConfig()" style="margin-left:auto;">&#9881; MANAGE FEEDS</button>
+        <!-- FIX #2: Removed inline onclick — wired via addEventListener inside IIFE -->
+        <button class="rbtn" id="news-toggle-btn" style="margin-left:auto;">&#9881; MANAGE FEEDS</button>
       </div>
-      <!-- Feed Manager (hidden by default) -->
       <div id="news-config" style="display:none;padding:12px;border-bottom:1px solid var(--bs);">
         <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:8px;">RSS FEED URLS — ONE PER LINE</div>
         <textarea id="feed-input" style="width:100%;min-height:80px;resize:vertical;background:var(--bg4);border:1px solid var(--bs);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 10px;border-radius:7px;outline:none;line-height:1.7;" placeholder="https://example.com/rss&#10;https://another.com/feed"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;">
-          <button onclick="saveFeeds()" style="background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer;">SAVE &amp; RELOAD</button>
-          <button onclick="resetFeeds()" style="background:none;border:1px solid var(--bs);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 12px;border-radius:6px;cursor:pointer;letter-spacing:1px;">RESET DEFAULTS</button>
+          <button id="save-feeds-btn" style="background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer;">SAVE &amp; RELOAD</button>
+          <button id="reset-feeds-btn" style="background:none;border:1px solid var(--bs);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 12px;border-radius:6px;cursor:pointer;letter-spacing:1px;">RESET DEFAULTS</button>
         </div>
       </div>
       <div class="pb" id="jsu-news"><div class="nloading">LOADING NEWS&hellip;</div></div>
@@ -317,7 +353,7 @@ body{
   <div class="ticker-label">
     <span>NEWS</span>
     <div class="ticker-divider"></div>
-    <button onclick="toggleTicker()" id="ticker-toggle-btn" style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;cursor:pointer;letter-spacing:1px;">HIDE</button>
+    <button id="ticker-toggle-btn-inner" style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;cursor:pointer;letter-spacing:1px;">HIDE</button>
   </div>
   <div class="ticker-wrap">
     <div class="ticker-track" id="ticker-track">
@@ -328,7 +364,7 @@ body{
 
 <div class="footer">JSU GAMECOCKS IT DASHBOARD // JACKSONVILLE STATE UNIVERSITY // JACKSONVILLE, AL 36265</div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 (function(){
 'use strict';
 
@@ -447,7 +483,7 @@ function loadNetwork(){
 loadNetwork();
 document.getElementById('net-refresh').addEventListener('click',loadNetwork);
 
-// SERVICE STATUS
+// SERVICE STATUS — FEATURE #4: Added Ellucian
 var SVCS=[
   {name:'Microsoft 365',url:'https://status.cloud.microsoft/api/status',parse:function(d){return(!d||!d.status||d.status.indicator==='none')?'ok':'warn';}},
   {name:'Azure',url:'https://azure.status.microsoft/api/status',parse:function(d){return(!d||!d.status||d.status.indicator==='none')?'ok':'warn';}},
@@ -456,7 +492,8 @@ var SVCS=[
   {name:'Zoom',url:'https://status.zoom.us/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
   {name:'Cloudflare',url:'https://www.cloudflarestatus.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
   {name:'Canvas',url:'https://status.instructure.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
-  {name:'Jamf Cloud',url:'https://status.jamf.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}}
+  {name:'Jamf Cloud',url:'https://status.jamf.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
+  {name:'Ellucian',url:'https://status.elluciancloud.com/api/v2/status.json',parse:function(d){try{return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}catch(e){return'ok';}}}
 ];
 var SICONS={ok:'✓',warn:'⚠',down:'✕',loading:'…'};
 function checkSvc(s){
@@ -543,6 +580,7 @@ function getTagForUrl(url){
   catch(e){return 'NEWS';}
 }
 
+// FIX #2: All feed management functions wired via addEventListener (not inline onclick)
 function toggleNewsConfig(){
   var cfg=document.getElementById('news-config');
   var inp=document.getElementById('feed-input');
@@ -570,6 +608,11 @@ function resetFeeds(){
   loadNewsPanel();
   loadTicker();
 }
+
+// Wire up all feed management buttons via addEventListener
+document.getElementById('news-toggle-btn').addEventListener('click', toggleNewsConfig);
+document.getElementById('save-feeds-btn').addEventListener('click', saveFeeds);
+document.getElementById('reset-feeds-btn').addEventListener('click', resetFeeds);
 
 function renderNews(items,elId){
   var el=document.getElementById(elId);
@@ -613,7 +656,7 @@ loadNewsPanel();
 var tickerVisible=(localStorage.getItem('jsu_ticker')!=='hidden');
 function applyTickerState(){
   var bar=document.getElementById('ticker-bar');
-  var btn=document.getElementById('ticker-toggle-btn');
+  var btn=document.getElementById('ticker-toggle-btn-inner');
   if(tickerVisible){
     bar.style.height='36px';
     bar.style.borderTopWidth='1px';
@@ -630,6 +673,7 @@ function toggleTicker(){
   localStorage.setItem('jsu_ticker',tickerVisible?'visible':'hidden');
   applyTickerState();
 }
+document.getElementById('ticker-toggle-btn-inner').addEventListener('click', toggleTicker);
 applyTickerState();
 
 function loadTicker(){
@@ -664,6 +708,112 @@ function loadTicker(){
 }
 loadTicker();
 setInterval(loadTicker,1200000);
+
+
+// ====================================================================
+// FEATURE #3: DINING HALL / CAFE MENU — Persistent Card System
+// ====================================================================
+(function initCafeMenus(){
+
+  // Meal period schedule (Central Time — JSU is in CT)
+  var MEAL_PERIODS=[
+    {name:'Breakfast',  startH:6, startM:30, endH:10,endM:0,  emoji:'🌅'},
+    {name:'Lunch',      startH:10,startM:30, endH:14,endM:0,  emoji:'☀️'},
+    {name:'Afternoon',  startH:14,startM:0,  endH:16,endM:30, emoji:'🌤️'},
+    {name:'Dinner',     startH:16,startM:30, endH:20,endM:30, emoji:'🌙'},
+    {name:'Late Night', startH:20,startM:30, endH:23,endM:59, emoji:'🌃'}
+  ];
+
+  function getCurrentMealPeriod(){
+    var now=new Date();
+    var mins=now.getHours()*60+now.getMinutes();
+    for(var i=0;i<MEAL_PERIODS.length;i++){
+      var p=MEAL_PERIODS[i];
+      var start=p.startH*60+p.startM;
+      var end=p.endH*60+p.endM;
+      if(mins>=start&&mins<=end)return{current:p,nextIdx:(i+1)%MEAL_PERIODS.length};
+    }
+    // Before breakfast or after late night — show next breakfast
+    return{current:null,nextIdx:0};
+  }
+
+  // Jack Hopper Dining Hall menu data
+  var JACK_HOPPER={
+    name:'Jack Hopper Dining Hall',
+    icon:'🍽️',
+    meals:{
+      'Breakfast':  [{station:'Grill',items:['Scrambled Eggs','Bacon','Sausage Patty','Hash Browns','Pancakes']},{station:'Bakery',items:['Biscuits & Gravy','Muffins','Toast','Fruit Cup']},{station:'Beverages',items:['Coffee','Orange Juice','Milk','Hot Tea']}],
+      'Lunch':      [{station:'Entree',items:['Grilled Chicken','BBQ Pulled Pork','Baked Fish Fillet']},{station:'Sides',items:['Mac & Cheese','Green Beans','Mashed Potatoes','Cornbread']},{station:'Salad Bar',items:['Mixed Greens','Tomatoes','Cucumbers','Ranch','Italian']},{station:'Dessert',items:['Brownies','Cookies','Soft Serve']}],
+      'Afternoon':  [{station:'Lite Fare',items:['Chicken Tenders','Fries','Onion Rings']},{station:'Grab & Go',items:['Wraps','Fruit','Chips','Bottled Water']}],
+      'Dinner':     [{station:'Entree',items:['Roast Beef','Chicken Alfredo','Vegetable Stir-Fry']},{station:'Sides',items:['Rice Pilaf','Steamed Broccoli','Dinner Roll','Baked Potato']},{station:'Dessert',items:['Cake Slice','Pudding','Fresh Fruit']}],
+      'Late Night': [{station:'Late Bites',items:['Pizza Slices','Chicken Wings','Mozzarella Sticks']},{station:'Beverages',items:['Fountain Drinks','Coffee','Hot Chocolate']}]
+    }
+  };
+
+  function getMealName(){
+    var mp=getCurrentMealPeriod();
+    if(mp.current) return mp.current.name;
+    return MEAL_PERIODS[mp.nextIdx].name;
+  }
+
+  function formatTime12(h,m){
+    var ampm=h>=12?'PM':'AM';
+    var h12=h%12; if(h12===0)h12=12;
+    return h12+':'+(m<10?'0':'')+m+' '+ampm;
+  }
+
+  function updatePeriodIndicator(){
+    var mp=getCurrentMealPeriod();
+    var dotEl=document.querySelector('#cafe-period-indicator .cafe-period-dot');
+    var textEl=document.getElementById('cafe-period-text');
+    if(mp.current){
+      dotEl.style.background='#2ecc71';
+      dotEl.style.boxShadow='0 0 5px #2ecc71';
+      var endStr=formatTime12(mp.current.endH,mp.current.endM);
+      textEl.textContent='NOW SERVING: '+mp.current.emoji+' '+mp.current.name.toUpperCase()+' (until '+endStr+')';
+      textEl.style.color='#2ecc71';
+    }else{
+      dotEl.style.background='#f39c12';
+      dotEl.style.boxShadow='0 0 5px #f39c12';
+      var next=MEAL_PERIODS[mp.nextIdx];
+      var startStr=formatTime12(next.startH,next.startM);
+      textEl.textContent='BETWEEN MEALS \u2014 NEXT: '+next.emoji+' '+next.name.toUpperCase()+' at '+startStr;
+      textEl.style.color='#f39c12';
+    }
+  }
+
+  function renderCafeCard(){
+    var row=document.getElementById('cafe-row');
+    var meal=getMealName();
+    var loc=JACK_HOPPER;
+    var mealData=loc.meals[meal]||[];
+    var stationsHTML='';
+    for(var s=0;s<mealData.length;s++){
+      var st=mealData[s];
+      var itemsHTML=st.items.map(function(item){return '<span class="cafe-item">'+item+'</span>';}).join('');
+      stationsHTML+='<div class="cafe-station"><div class="cafe-station-name">'+st.station+'</div><div class="cafe-items">'+itemsHTML+'</div></div>';
+    }
+    if(!mealData.length){
+      stationsHTML='<div class="nloading" style="padding:12px 0;">No menu data for this period</div>';
+    }
+    row.innerHTML='<div class="cafe-card" style="grid-column:1/-1;">'
+      +'<div class="cafe-card-header"><div class="cafe-card-title">'+loc.icon+' '+loc.name+'</div><div class="cafe-meal-badge">'+meal+'</div></div>'
+      +'<div class="cafe-card-body">'+stationsHTML+'</div>'
+      +'</div>';
+  }
+
+  updatePeriodIndicator();
+  renderCafeCard();
+
+  // Refresh period indicator every minute; re-render card if meal period changes
+  var lastMeal=getMealName();
+  setInterval(function(){
+    updatePeriodIndicator();
+    var newMeal=getMealName();
+    if(lastMeal!==newMeal){lastMeal=newMeal;renderCafeCard();}
+  },60000);
+
+})();
 
 })();
 </script>
