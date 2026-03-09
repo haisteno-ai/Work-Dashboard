@@ -546,12 +546,16 @@ document.getElementById('sl-clear').addEventListener('click',function(){
   localStorage.removeItem('jsu_shiftlog');
 });
 
-// RSS HELPER — multi-strategy: CORS proxy + client XML parse, then rss2json fallback
+// RSS HELPER — multi-strategy fetch with CORS proxies + client XML parse
 function parseRSSXml(xmlText,limit){
   limit=limit||8;
+  // Strip any BOM or leading whitespace that can break DOMParser
+  xmlText=xmlText.replace(/^\s*/, '').replace(/^\uFEFF/, '');
   var parser=new DOMParser();
   var doc=parser.parseFromString(xmlText,'text/xml');
-  if(doc.querySelector('parsererror'))throw new Error('XML parse error');
+  // Check for parse errors
+  var pe=doc.querySelector('parsererror');
+  if(pe)throw new Error('XML parse error: '+pe.textContent.substring(0,80));
   var items=[];
   // Try RSS 2.0 <item> tags first, then Atom <entry> tags
   var nodes=doc.querySelectorAll('item');
@@ -559,60 +563,102 @@ function parseRSSXml(xmlText,limit){
   for(var i=0;i<Math.min(nodes.length,limit);i++){
     var node=nodes[i];
     var title='';var link='';var pubDate='';
-    // RSS 2.0
-    if(node.querySelector('title'))title=node.querySelector('title').textContent;
-    var linkEl=node.querySelector('link');
-    if(linkEl){
-      link=linkEl.textContent||linkEl.getAttribute('href')||'';
-      // Atom feeds use <link href="..."/>
-      if(!link&&linkEl.getAttribute('href'))link=linkEl.getAttribute('href');
+    // Title
+    var titleEl=node.querySelector('title');
+    if(titleEl) title=titleEl.textContent||'';
+    // Link — RSS uses <link>text</link>, Atom uses <link href="..."/>
+    var linkEls=node.getElementsByTagName('link');
+    for(var li=0;li<linkEls.length;li++){
+      var le=linkEls[li];
+      var href=le.getAttribute('href');
+      var txt=(le.textContent||'').trim();
+      if(href){link=href;break;}
+      if(txt&&txt.indexOf('http')===0){link=txt;break;}
     }
-    if(node.querySelector('pubDate'))pubDate=node.querySelector('pubDate').textContent;
-    else if(node.querySelector('published'))pubDate=node.querySelector('published').textContent;
-    else if(node.querySelector('updated'))pubDate=node.querySelector('updated').textContent;
-    if(title)items.push({title:title.trim(),link:link.trim(),pubDate:pubDate});
+    // Date
+    var dateEl=node.querySelector('pubDate')||node.querySelector('published')||node.querySelector('updated');
+    if(dateEl) pubDate=dateEl.textContent||'';
+    if(title) items.push({title:title.trim(),link:link.trim(),pubDate:pubDate});
   }
-  if(!items.length)throw new Error('No items found');
+  if(!items.length)throw new Error('No items found in feed');
   return items;
 }
 
-var CORS_PROXIES=[
-  function(u){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(u);},
-  function(u){return 'https://corsproxy.io/?'+encodeURIComponent(u);}
-];
-
-function fetchRSSViaProxy(url,limit){
-  var attempt=0;
-  function tryNext(){
-    if(attempt>=CORS_PROXIES.length)return Promise.reject(new Error('All proxies failed'));
-    var proxyUrl=CORS_PROXIES[attempt](url);
-    attempt++;
-    return fetch(proxyUrl,{cache:'no-cache'})
-    .then(function(r){
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      return r.text();
-    })
-    .then(function(text){return parseRSSXml(text,limit);})
-    .catch(function(){return tryNext();});
-  }
-  return tryNext();
+// Fetch with a timeout wrapper
+function fetchWithTimeout(url,opts,ms){
+  ms=ms||8000;
+  return new Promise(function(resolve,reject){
+    var timer=setTimeout(function(){reject(new Error('Timeout'));},ms);
+    fetch(url,opts||{}).then(function(r){
+      clearTimeout(timer);resolve(r);
+    }).catch(function(e){
+      clearTimeout(timer);reject(e);
+    });
+  });
 }
 
-function fetchRSSViaJson(url,limit){
-  limit=limit||8;
-  return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url)+'&count='+limit)
+// Strategy A: allorigins.win /raw endpoint — PROVEN RELIABLE
+function fetchViaAllOriginsRaw(url,limit){
+  return fetchWithTimeout('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
+  .then(function(r){
+    if(!r.ok)throw new Error('allorigins-raw HTTP '+r.status);
+    return r.text();
+  })
+  .then(function(text){return parseRSSXml(text,limit);});
+}
+
+// Strategy B: allorigins.win /get endpoint (JSON wrapper)
+function fetchViaAllOrigins(url,limit){
+  return fetchWithTimeout('https://api.allorigins.win/get?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
+  .then(function(r){
+    if(!r.ok)throw new Error('allorigins HTTP '+r.status);
+    return r.json();
+  })
+  .then(function(j){
+    if(!j.contents)throw new Error('allorigins: empty contents');
+    return parseRSSXml(j.contents,limit);
+  });
+}
+
+// Strategy C: Direct fetch (works for same-origin or CORS-enabled feeds)
+function fetchViaDirect(url,limit){
+  return fetchWithTimeout(url,{cache:'no-cache'},10000)
+  .then(function(r){
+    if(!r.ok)throw new Error('direct HTTP '+r.status);
+    return r.text();
+  })
+  .then(function(text){return parseRSSXml(text,limit);});
+}
+
+// Strategy D: rss2json.com API (no count param — requires API key now)
+function fetchViaRss2Json(url){
+  return fetchWithTimeout('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),{},10000)
   .then(function(r){return r.json();})
-  .then(function(d){if(d.status!=='ok')throw new Error('rss2json: '+d.message);return d.items;});
+  .then(function(d){
+    if(d.status!=='ok')throw new Error('rss2json: '+(d.message||'unknown error'));
+    return d.items;
+  });
 }
 
+// Master fetch: try each strategy in sequence, stop at first success
 function fetchRSS(url,limit){
   limit=limit||8;
-  // Strategy 1: CORS proxy + client-side XML parse
-  return fetchRSSViaProxy(url,limit)
-  .catch(function(){
-    // Strategy 2: rss2json.com API
-    return fetchRSSViaJson(url,limit);
-  });
+  var strategies=[
+    function(){return fetchViaAllOriginsRaw(url,limit);},
+    function(){return fetchViaAllOrigins(url,limit);},
+    function(){return fetchViaDirect(url,limit);},
+    function(){return fetchViaRss2Json(url);}
+  ];
+  var idx=0;
+  function tryNext(){
+    if(idx>=strategies.length)return Promise.reject(new Error('All '+strategies.length+' fetch strategies failed for: '+url));
+    var fn=strategies[idx];idx++;
+    return fn().catch(function(e){
+      console.warn('RSS strategy '+idx+'/'+strategies.length+' failed for '+url+':',e.message);
+      return tryNext();
+    });
+  }
+  return tryNext();
 }
 
 function cleanTitle(t){
