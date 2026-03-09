@@ -546,13 +546,75 @@ document.getElementById('sl-clear').addEventListener('click',function(){
   localStorage.removeItem('jsu_shiftlog');
 });
 
-// RSS HELPER
-function fetchRSS(url,limit){
+// RSS HELPER — multi-strategy: CORS proxy + client XML parse, then rss2json fallback
+function parseRSSXml(xmlText,limit){
+  limit=limit||8;
+  var parser=new DOMParser();
+  var doc=parser.parseFromString(xmlText,'text/xml');
+  if(doc.querySelector('parsererror'))throw new Error('XML parse error');
+  var items=[];
+  // Try RSS 2.0 <item> tags first, then Atom <entry> tags
+  var nodes=doc.querySelectorAll('item');
+  if(!nodes.length) nodes=doc.querySelectorAll('entry');
+  for(var i=0;i<Math.min(nodes.length,limit);i++){
+    var node=nodes[i];
+    var title='';var link='';var pubDate='';
+    // RSS 2.0
+    if(node.querySelector('title'))title=node.querySelector('title').textContent;
+    var linkEl=node.querySelector('link');
+    if(linkEl){
+      link=linkEl.textContent||linkEl.getAttribute('href')||'';
+      // Atom feeds use <link href="..."/>
+      if(!link&&linkEl.getAttribute('href'))link=linkEl.getAttribute('href');
+    }
+    if(node.querySelector('pubDate'))pubDate=node.querySelector('pubDate').textContent;
+    else if(node.querySelector('published'))pubDate=node.querySelector('published').textContent;
+    else if(node.querySelector('updated'))pubDate=node.querySelector('updated').textContent;
+    if(title)items.push({title:title.trim(),link:link.trim(),pubDate:pubDate});
+  }
+  if(!items.length)throw new Error('No items found');
+  return items;
+}
+
+var CORS_PROXIES=[
+  function(u){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(u);},
+  function(u){return 'https://corsproxy.io/?'+encodeURIComponent(u);}
+];
+
+function fetchRSSViaProxy(url,limit){
+  var attempt=0;
+  function tryNext(){
+    if(attempt>=CORS_PROXIES.length)return Promise.reject(new Error('All proxies failed'));
+    var proxyUrl=CORS_PROXIES[attempt](url);
+    attempt++;
+    return fetch(proxyUrl,{cache:'no-cache'})
+    .then(function(r){
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return r.text();
+    })
+    .then(function(text){return parseRSSXml(text,limit);})
+    .catch(function(){return tryNext();});
+  }
+  return tryNext();
+}
+
+function fetchRSSViaJson(url,limit){
   limit=limit||8;
   return fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url)+'&count='+limit)
   .then(function(r){return r.json();})
-  .then(function(d){if(d.status!=='ok')throw new Error('bad');return d.items;});
+  .then(function(d){if(d.status!=='ok')throw new Error('rss2json: '+d.message);return d.items;});
 }
+
+function fetchRSS(url,limit){
+  limit=limit||8;
+  // Strategy 1: CORS proxy + client-side XML parse
+  return fetchRSSViaProxy(url,limit)
+  .catch(function(){
+    // Strategy 2: rss2json.com API
+    return fetchRSSViaJson(url,limit);
+  });
+}
+
 function cleanTitle(t){
   return t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,'').trim();
 }
@@ -631,6 +693,7 @@ function loadNewsPanel(){
   el.innerHTML='<div class="nloading">LOADING...</div>';
   var urls=getSavedFeeds();
   var allItems=[];
+  var failedUrls=[];
   var promises=urls.map(function(url){
     var tag=getTagForUrl(url);
     return fetchRSS(url,5)
@@ -639,15 +702,30 @@ function loadNewsPanel(){
         allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag,pubDate:i.pubDate});
       });
     })
-    .catch(function(){});
+    .catch(function(err){
+      failedUrls.push(url);
+    });
   });
   Promise.all(promises).then(function(){
     if(!allItems.length){
-      el.innerHTML='<div class="nloading">No stories found. Try updating your feed URLs.</div>';
+      var msg='No stories found.';
+      if(failedUrls.length){
+        msg+=' Failed to fetch '+failedUrls.length+' feed(s):<br>'
+          +failedUrls.map(function(u){return '<span style="color:var(--red);font-size:10px;word-break:break-all;">'+u+'</span>';}).join('<br>');
+        msg+='<br><span style="opacity:.6;font-size:9px;margin-top:6px;display:inline-block;">Tip: Make sure URLs point to a valid RSS/Atom XML feed.</span>';
+      }
+      el.innerHTML='<div class="nloading" style="text-align:left;padding:14px;">'+msg+'</div>';
       return;
     }
     allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate);});
     renderNews(allItems.slice(0,10),'jsu-news');
+    // Subtle warning if some feeds failed but others worked
+    if(failedUrls.length){
+      var warn=document.createElement('div');
+      warn.style.cssText='font-family:"Share Tech Mono",monospace;font-size:9px;color:#f39c12;opacity:.7;padding:6px 10px 0;letter-spacing:1px;';
+      warn.textContent='⚠ '+failedUrls.length+' FEED(S) FAILED TO LOAD';
+      el.appendChild(warn);
+    }
   });
 }
 loadNewsPanel();
@@ -680,6 +758,7 @@ function loadTicker(){
   var track=document.getElementById('ticker-track');
   var urls=getSavedFeeds();
   var allItems=[];
+  var failCount=0;
   var promises=urls.map(function(url){
     var tag=getTagForUrl(url);
     return fetchRSS(url,5)
@@ -688,11 +767,12 @@ function loadTicker(){
         allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag});
       });
     })
-    .catch(function(){});
+    .catch(function(){failCount++;});
   });
   Promise.all(promises).then(function(){
     if(!allItems.length){
-      allItems=[{title:'Add RSS feeds via the Manage Feeds button in the News panel',link:'#',tag:'INFO'}];
+      var msg=failCount?'RSS feeds failed to load — check your feed URLs in Manage Feeds':'Add RSS feeds via the Manage Feeds button in the News panel';
+      allItems=[{title:msg,link:'#',tag:failCount?'ERROR':'INFO'}];
     }
     var doubled=allItems.concat(allItems);
     var html=doubled.map(function(i){
