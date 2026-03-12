@@ -1,942 +1,888 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>JSU IT Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Ticket Tracker — Week of March 11</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{
-  --red:#D4163C;--red-dark:#a01028;--red-glow:rgba(212,22,60,0.35);
-  --bg:#0c0c0e;--bg2:#131316;--bg3:#1a1a1f;--bg4:#202027;
-  --text:#f0eeea;--muted:#c9c5bd;
-  --border:rgba(212,22,60,0.22);--bs:rgba(255,255,255,0.06);
-  --ticker-bg:#0a0a0c;--ticker-border:rgba(212,22,60,0.3);
-  --toggle-off:#3a3a44;
-}
-[data-theme="light"]{
-  --red:#b80e2a;--red-dark:#880a1e;--red-glow:rgba(184,14,42,0.22);
-  --bg:#e8e9ee;--bg2:#f4f4f8;--bg3:#ebebf1;--bg4:#dddde6;
-  --text:#1a1a26;--muted:#55556e;
-  --border:rgba(184,14,42,0.18);--bs:rgba(0,0,0,0.07);
-  --ticker-bg:#dcdce4;--ticker-border:rgba(184,14,42,0.25);
-  --toggle-off:#aaaab8;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'Rajdhani',sans-serif;
-  min-height:100vh;overflow-x:hidden;
-  display:flex;flex-direction:column;
-  transition:background .3s,color .3s;
-}
-[data-theme="dark"] body{
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%,rgba(212,22,60,.1) 0%,transparent 60%),
-    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.012) 40px),
-    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.012) 40px);
-}
-[data-theme="dark"] body::before{
-  content:'';position:fixed;inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.02) 2px,rgba(0,0,0,.02) 4px);
-  pointer-events:none;z-index:9998;
-}
-.ios-wrap{display:flex;align-items:center;gap:7px;user-select:none;}
-.ios-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;}
-.ios-toggle{position:relative;width:44px;height:26px;cursor:pointer;flex-shrink:0;}
-.ios-toggle input{opacity:0;width:0;height:0;position:absolute;}
-.ios-track{position:absolute;inset:0;border-radius:13px;background:var(--toggle-off);transition:background .3s;}
-.ios-toggle input:checked+.ios-track{background:#2ecc71;}
-.ios-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .28s cubic-bezier(.34,1.2,.64,1);pointer-events:none;}
-.ios-toggle input:checked~.ios-thumb{transform:translateX(18px);}
-#alert-banner{display:none;flex-shrink:0;background:linear-gradient(90deg,var(--red-dark),var(--red),var(--red-dark));color:#fff;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:7px 28px;text-align:center;animation:alertpulse 1.5s infinite;z-index:100;}
-@keyframes alertpulse{0%,100%{opacity:1}50%{opacity:.75}}
-.header{display:flex;align-items:center;justify-content:space-between;padding:11px 26px;background:var(--bg2);border-bottom:1px solid var(--border);position:relative;overflow:hidden;flex-shrink:0;transition:background .3s,border-color .3s;}
-.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
-.header-brand{display:flex;align-items:center;gap:12px;}
-.rooster{width:42px;height:42px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 14px var(--red-glow);flex-shrink:0;}
-.brand-title{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:800;letter-spacing:3px;text-transform:uppercase;line-height:1;color:var(--text);}
-.brand-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-top:3px;}
-.hdr-mid{display:flex;align-items:center;gap:12px;}
-.support-btn{display:flex;align-items:center;gap:7px;padding:9px 17px;background:rgba(212,22,60,.09);border:1px solid rgba(212,22,60,.4);border-radius:8px;color:var(--text);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .2s;animation:spulse 3s infinite;}
-.support-btn:hover{background:rgba(212,22,60,.2);border-color:var(--red);box-shadow:0 0 14px var(--red-glow);transform:translateY(-1px);animation:none;}
-@keyframes spulse{0%,100%{box-shadow:0 0 0 0 rgba(212,22,60,0)}50%{box-shadow:0 0 8px 2px rgba(212,22,60,.18)}}
-.hdr-right{display:flex;align-items:center;gap:14px;}
-.sys-status{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);}
-.sys-dot{width:7px;height:7px;border-radius:50%;background:#2ecc71;box-shadow:0 0 6px #2ecc71;animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.clock-time{font-family:'Share Tech Mono',monospace;font-size:27px;line-height:1;letter-spacing:2px;text-align:right;color:var(--text);}
-.clock-date{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:3px;text-align:right;}
-.main{padding:13px 26px 0;display:flex;flex-direction:column;gap:11px;flex:1;}
-.panel{background:var(--bg2);border:1px solid var(--bs);border-radius:10px;overflow:hidden;transition:background .3s,border-color .3s;animation:fadeIn .35s ease both;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.ph{display:flex;align-items:center;gap:8px;padding:7px 13px;background:var(--bg3);border-bottom:1px solid var(--bs);transition:background .3s;}
-.pdot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red-glow);flex-shrink:0;}
-.ptitle{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
-.pb{padding:12px;}
-.rbtn{background:none;border:1px solid var(--bs);color:var(--muted);border-radius:4px;padding:2px 8px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;margin-left:auto;transition:all .15s;letter-spacing:1px;}
-.rbtn:hover{border-color:var(--red);color:var(--red);}
-.links-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
-.lg-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-.lg-stack{display:flex;flex-direction:column;gap:4px;}
-.lb{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--bg3);border:1px solid var(--bs);border-radius:7px;color:var(--text);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.3px;transition:all .15s;white-space:nowrap;overflow:hidden;}
-.lb:hover{background:var(--bg4);border-color:var(--red);box-shadow:0 0 9px var(--red-glow);transform:translateX(2px);}
-.li{font-size:13px;flex-shrink:0;}
-.ll{overflow:hidden;text-overflow:ellipsis;flex:1;}
-.ai-launcher{display:flex;align-items:center;gap:8px;}
-.ai-sel-wrap{position:relative;flex-shrink:0;}
-.ai-sel{appearance:none;-webkit-appearance:none;background:var(--bg3);border:1px solid var(--bs);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:10px 28px 10px 11px;border-radius:7px;cursor:pointer;letter-spacing:1px;outline:none;transition:border-color .15s;min-width:122px;}
-.ai-sel:hover,.ai-sel:focus{border-color:var(--red);}
-.ai-sel option{background:var(--bg3);color:var(--text);}
-.ai-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--red);pointer-events:none;font-size:9px;}
-.ai-input{flex:1;background:var(--bg3);border:1px solid var(--bs);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;padding:10px 12px;border-radius:7px;outline:none;transition:border-color .15s;letter-spacing:.3px;}
-.ai-input::placeholder{color:var(--muted);opacity:.45;}
-.ai-input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(212,22,60,.1);}
-.ai-go{background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;padding:10px 16px;border-radius:7px;cursor:pointer;transition:all .15s;text-transform:uppercase;flex-shrink:0;}
-.ai-go:hover{background:var(--red-dark);box-shadow:0 0 12px var(--red-glow);}
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-.weather-loc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);opacity:.7;letter-spacing:1px;margin-bottom:8px;}
-.weather-main{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
-.weather-icon{font-size:42px;line-height:1;}
-.weather-temp{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;line-height:1;color:var(--text);}
-.weather-unit{font-size:22px;color:var(--red);}
-.weather-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.weather-meta{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.wm-item{background:var(--bg4);border-radius:6px;padding:6px 9px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);transition:background .3s;}
-.wm-label{color:var(--red);font-size:8px;margin-bottom:2px;letter-spacing:1px;}
-.net-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.net-item{background:var(--bg4);border-radius:7px;padding:8px 10px;transition:background .3s;}
-.net-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--red);letter-spacing:2px;margin-bottom:3px;}
-.net-value{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);word-break:break-all;}
-.net-value.big{font-size:13px;}
-.svc-grid{display:flex;flex-wrap:wrap;gap:7px;}
-.svc-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bs);border-radius:20px;padding:5px 12px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);transition:all .25s;letter-spacing:.5px;}
-.svc-chip.ok{border-color:rgba(46,204,113,.25);}
-.svc-chip.warn{border-color:rgba(243,156,18,.5);color:var(--text);background:rgba(243,156,18,.07);}
-.svc-chip.down{border-color:rgba(212,22,60,.5);color:var(--text);background:rgba(212,22,60,.09);animation:chipblink 1s infinite;}
-@keyframes chipblink{0%,100%{opacity:1}50%{opacity:.55}}
-.svc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.svc-dot.ok{background:#2ecc71;box-shadow:0 0 5px #2ecc71;}
-.svc-dot.warn{background:#f39c12;box-shadow:0 0 5px #f39c12;}
-.svc-dot.down{background:var(--red);box-shadow:0 0 5px var(--red);}
-.svc-dot.loading{background:#555;}
-.svc-updated{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);opacity:.4;margin-top:9px;letter-spacing:1px;}
-.svc-issue-banner{display:none;margin-bottom:9px;background:rgba(212,22,60,.1);border:1px solid rgba(212,22,60,.35);border-radius:7px;padding:7px 11px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);letter-spacing:1px;}
-.shift-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-.shiftlog-ta{width:100%;min-height:100px;resize:vertical;background:var(--bg4);border:1px solid var(--bs);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:9px 11px;border-radius:7px;outline:none;transition:border-color .15s;line-height:1.6;}
-.shiftlog-ta:focus{border-color:rgba(212,22,60,.4);}
-.shiftlog-ta::placeholder{color:var(--muted);opacity:.4;}
-.shiftlog-foot{display:flex;align-items:center;justify-content:space-between;margin-top:7px;}
-.shiftlog-saved{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2ecc71;opacity:0;letter-spacing:1px;transition:opacity .3s;}
-.shiftlog-saved.show{opacity:1;}
-.shiftlog-clr{background:none;border:1px solid var(--bs);color:var(--muted);border-radius:4px;padding:3px 9px;font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s;letter-spacing:1px;}
-.shiftlog-clr:hover{border-color:var(--red);color:var(--red);}
-.news-list{display:flex;flex-direction:column;}
-.ni{padding:7px 10px;border-left:2px solid transparent;transition:all .15s;border-radius:4px;}
-.ni:hover{background:var(--bg4);border-left-color:var(--red);}
-.ni a{text-decoration:none;color:inherit;display:block;}
-.nh{font-size:12px;font-weight:600;line-height:1.4;margin-bottom:2px;color:var(--text);}
-.nm{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);opacity:.45;}
-.src-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:7px;padding:1px 4px;border-radius:2px;margin-right:4px;background:rgba(212,22,60,.13);color:var(--red);border:1px solid rgba(212,22,60,.27);letter-spacing:1px;vertical-align:middle;}
-.nloading{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);opacity:.45;padding:18px;text-align:center;}
-.ticker-bar{background:var(--ticker-bg);border-top:1px solid var(--ticker-border);display:flex;align-items:stretch;height:36px;flex-shrink:0;overflow:hidden;transition:background .3s,border-color .3s;}
-.ticker-label{display:flex;align-items:center;padding:0 14px;background:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#fff;white-space:nowrap;flex-shrink:0;gap:6px;}
-.ticker-divider{width:1px;background:rgba(255,255,255,.2);height:16px;}
-.ticker-wrap{flex:1;overflow:hidden;position:relative;}
-.ticker-track{display:flex;align-items:center;white-space:nowrap;position:absolute;top:0;left:0;height:100%;animation:tickscroll 60s linear infinite;will-change:transform;}
-.ticker-track:hover{animation-play-state:paused;}
-@keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 26px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;border-right:1px solid var(--bs);white-space:nowrap;height:100%;transition:color .15s;}
-.ticker-item:hover{color:var(--red);}
-.ticker-badge{font-family:'Share Tech Mono',monospace;font-size:8px;padding:1px 5px;border-radius:2px;background:rgba(212,22,60,.14);color:var(--red);border:1px solid rgba(212,22,60,.27);letter-spacing:1px;flex-shrink:0;}
-.ticker-sep{color:var(--red);opacity:.4;padding:0 4px;font-size:16px;}
-.footer{text-align:center;padding:7px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);opacity:.25;letter-spacing:2px;flex-shrink:0;}
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --accent: #4f9cf9;
+    --accent2: #f97b4f;
+    --accent3: #4ff9a0;
+    --warn: #f9c44f;
+    --danger: #f94f6a;
+    --text: #e2e8f8;
+    --muted: #6b7494;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
 
-/* ===== CAFE MENU CARD STYLES ===== */
-.cafe-card{background:var(--bg3);border:1px solid var(--bs);border-radius:9px;overflow:hidden;transition:all .3s;}
-.cafe-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-bottom:1px solid var(--bs);}
-.cafe-card-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text);}
-.cafe-meal-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(212,22,60,.14);color:var(--red);border:1px solid rgba(212,22,60,.3);letter-spacing:1px;text-transform:uppercase;}
-.cafe-card-body{padding:12px 14px;min-height:120px;}
-.cafe-station{margin-bottom:10px;}
-.cafe-station:last-child{margin-bottom:0;}
-.cafe-station-name{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:4px;text-transform:uppercase;}
-.cafe-items{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;color:var(--text);line-height:1.6;}
-.cafe-item{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg4);border-radius:4px;margin:2px 3px 2px 0;font-size:12px;transition:background .15s;}
-.cafe-card-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--bs);background:var(--bg4);}
-.cafe-nav-btn{background:none;border:1px solid var(--bs);color:var(--muted);border-radius:5px;padding:4px 12px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:1px;display:flex;align-items:center;gap:4px;}
-.cafe-nav-btn:hover:not(:disabled){border-color:var(--red);color:var(--red);background:rgba(212,22,60,.06);}
-.cafe-nav-btn:disabled{opacity:.3;cursor:default;}
-.cafe-counter{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;}
-.cafe-period-indicator{display:flex;align-items:center;gap:6px;}
-.cafe-period-dot{width:6px;height:6px;border-radius:50%;background:#2ecc71;box-shadow:0 0 5px #2ecc71;animation:blink 2s infinite;}
-.cafe-period-text{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2ecc71;letter-spacing:1px;}
-.cafe-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .deadline-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(249,196,79,0.12);
+    border: 1px solid rgba(249,196,79,0.3);
+    color: var(--warn);
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .progress-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* FILTERS */
+  .filters {
+    padding: 16px 28px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 0;
+    min-height: calc(100vh - 110px);
+  }
+
+  .ticket-list {
+    padding: 20px 28px;
+    border-right: 1px solid var(--border);
+  }
+
+  .sidebar {
+    padding: 20px;
+    background: var(--surface);
+  }
+
+  /* TICKETS */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 4px;
+  }
+
+  .ticket {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .ticket.status-open::before { background: var(--accent); }
+  .ticket.status-in-progress::before { background: var(--warn); }
+  .ticket.status-needs-scheduling::before { background: var(--accent2); }
+  .ticket.status-done::before { background: var(--accent3); }
+
+  .ticket:hover { border-color: #3a4060; transform: translateX(2px); }
+  .ticket.selected { border-color: var(--accent); background: var(--surface2); }
+  .ticket.status-done { opacity: 0.5; }
+
+  .ticket-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .ticket-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ticket-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  .status-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pill-open { background: rgba(79,156,249,0.12); color: var(--accent); }
+  .pill-in-progress { background: rgba(249,196,79,0.12); color: var(--warn); }
+  .pill-needs-scheduling { background: rgba(249,123,79,0.12); color: var(--accent2); }
+  .pill-done { background: rgba(79,249,160,0.12); color: var(--accent3); }
+
+  .ticket-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .tag.tag-person { color: #b794f4; border-color: rgba(183,148,244,0.2); background: rgba(183,148,244,0.06); }
+  .tag.tag-location { color: #76e4f7; border-color: rgba(118,228,247,0.2); background: rgba(118,228,247,0.06); }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    position: sticky;
+    top: 110px;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+  }
+
+  .detail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .detail-empty .icon { font-size: 32px; opacity: 0.3; }
+
+  .detail-card { display: none; }
+  .detail-card.active { display: block; }
+
+  .detail-ticket-id {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .detail-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .detail-section {
+    margin-bottom: 18px;
+  }
+
+  .detail-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .detail-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #a0aec0;
+  }
+
+  .status-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .notes-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .notes-area:focus, .status-select:focus { outline: none; border-color: var(--accent); }
+
+  .save-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.15s;
+    margin-top: 6px;
+  }
+
+  .save-btn:hover { opacity: 0.85; }
+
+  .people-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .person-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .person-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #b794f4;
+    flex-shrink: 0;
+  }
+
+  /* SIDEBAR STATS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .stat-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .stat-open .stat-num { color: var(--accent); }
+  .stat-sched .stat-num { color: var(--accent2); }
+  .stat-prog .stat-num { color: var(--warn); }
+  .stat-done .stat-num { color: var(--accent3); }
+
+  /* SCHEDULE SECTION */
+  .schedule-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+
+  .sched-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .sched-name { font-weight: 600; }
+  .sched-tick { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<div id="alert-banner">&#9888; &nbsp;WEATHER ALERT &mdash; <span id="alert-text"></span>&nbsp; &#9888;</div>
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎫</div>
+    <div>
+      <div class="logo-text">IT Ticket Tracker</div>
+      <div class="logo-sub">Week of March 11 — Due Friday</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="deadline-badge">⏰ Due: Friday Mar 14 @ 4:30 PM</div>
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <span id="progressText">0/15</span>
+    </div>
+  </div>
+</header>
 
-<div class="header">
-  <div class="header-brand">
-    <div class="rooster">&#x1F413;</div>
-    <div>
-      <div class="brand-title">JAX State Department of Information Technology</div>
-      <div class="brand-sub">JACKSONVILLE STATE UNIVERSITY // INFORMATION TECHNOLOGY</div>
-    </div>
-  </div>
-  <div class="hdr-mid">
-    <!-- FIX #1: mailto link instead of dead Cloudflare-encoded href -->
-    <a href="mailto:support@jsu.edu?subject=IT%20Support%20Request" class="support-btn">&#x2709;&#xFE0F;&nbsp; EMAIL IT SUPPORT</a>
-    <a href="https://kmgt.jsu.edu/adminui/ticket.php?QUEUE_ID=18" target="_blank" class="support-btn" style="background:rgba(212,22,60,.18);border-color:rgba(212,22,60,.6);">&#x1F3AB;&nbsp; NEW ZERO QUEUE TICKET</a>
-    <div class="ios-wrap">
-      <span class="ios-label" id="theme-lbl">DARK</span>
-      <label class="ios-toggle">
-        <input type="checkbox" id="theme-toggle"/>
-        <div class="ios-track"></div>
-        <div class="ios-thumb"></div>
-      </label>
-      <span style="font-size:13px">&#x2600;&#xFE0F;</span>
-    </div>
-  </div>
-  <div class="hdr-right">
-    <div class="sys-status"><div class="sys-dot"></div><span>SYSTEMS ONLINE</span></div>
-    <div>
-      <div class="clock-time" id="clock">--:--:--</div>
-      <div class="clock-date" id="date">---</div>
-    </div>
-  </div>
+<div class="filters" id="filterBar">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('open', this)">Open</button>
+  <button class="filter-btn" onclick="setFilter('needs-scheduling', this)">Needs Scheduling</button>
+  <button class="filter-btn" onclick="setFilter('in-progress', this)">In Progress</button>
+  <button class="filter-btn" onclick="setFilter('done', this)">Done</button>
 </div>
 
 <div class="main">
-
-  <!-- 1. QUICK ACCESS -->
-  <div class="panel">
-    <div class="ph"><div class="pdot"></div><div class="ptitle">Quick Access</div></div>
-    <div class="pb">
-      <div class="links-grid">
-        <div>
-          <div class="lg-title">&#x1F916; AI Tools</div>
-          <div class="lg-stack">
-            <a href="https://claude.ai" target="_blank" class="lb"><span class="li">&#x1F9E0;</span><span class="ll">Claude AI</span></a>
-            <a href="https://gemini.google.com" target="_blank" class="lb"><span class="li">&#x264A;</span><span class="ll">Gemini</span></a>
-            <a href="https://chatgpt.com" target="_blank" class="lb"><span class="li">&#x1F4AC;</span><span class="ll">ChatGPT</span></a>
-            <a href="https://grok.com" target="_blank" class="lb"><span class="li">&#x26A1;</span><span class="ll">Grok</span></a>
-          </div>
-        </div>
-        <div>
-          <div class="lg-title">&#x1F5A5;&#xFE0F; IT Management</div>
-          <div class="lg-stack">
-            <a href="https://kmgt.jsu.edu/adminui/computer_inventory.php" target="_blank" class="lb"><span class="li">&#x1F5A5;&#xFE0F;</span><span class="ll">Devices</span></a>
-            <a href="https://kmgt.jsu.edu/adminui/ticket_list.php?BY_TYPE_TICKETS=mine_andunassigned&QUEUE_ID=18" target="_blank" class="lb"><span class="li">&#x1F3AB;</span><span class="ll">Tickets</span></a>
-            <a href="https://kmgt.jsu.edu/adminui/assets.php" target="_blank" class="lb"><span class="li">&#x1F4E6;</span><span class="ll">Assets</span></a>
-            <a href="https://intune.microsoft.com" target="_blank" class="lb"><span class="li">&#x1F512;</span><span class="ll">Intune</span></a>
-            <a href="https://jsu.jamfcloud.com/" target="_blank" class="lb"><span class="li">&#x1F34E;</span><span class="ll">Jamf Pro</span></a>
-          </div>
-        </div>
-        <div>
-          <div class="lg-title">&#x1F393; JSU Campus</div>
-          <div class="lg-stack">
-            <a href="https://haisteno-ai.github.io/TSC-Scheduler/" target="_blank" class="lb"><span class="li">&#x1F4CD;</span><span class="ll">Room Tracker</span></a>
-            <a href="https://haisteno-ai.github.io/Directory/" target="_blank" class="lb"><span class="li">&#x1F50E;</span><span class="ll">JaxFinder</span></a>
-            <a href="https://jsu.sharepoint.com/:x:/s/technologysupportcenter/EQSHP1fhOI5OlLqF5xEvCGsBSiZkEEglx5jFH6lqhPg_tw?e=pu9T7d" target="_blank" class="lb"><span class="li">&#x1F5A8;&#xFE0F;</span><span class="ll">Network Printers</span></a>
-            <a href="https://mm.jsu.edu" target="_blank" class="lb"><span class="li">&#x1F310;</span><span class="ll">Micetro &mdash; IP Mgmt</span></a>
-          </div>
-        </div>
-        <div>
-          <div class="lg-title">&#x2601;&#xFE0F; Microsoft &amp; Misc</div>
-          <div class="lg-stack">
-            <a href="https://portal.azure.com" target="_blank" class="lb"><span class="li">&#x2601;&#xFE0F;</span><span class="ll">Azure Portal</span></a>
-            <a href="https://forms.office.com/pages/responsepage.aspx?id=FEz0Mg7NOUW3YzyGCnZyerDOIZOjKw1HkHiWWtiqVJNURTE0NDhBRDdZNjNDWEtNWTZPNjlKMU4xQy4u&route=shorturl" target="_blank" class="lb"><span class="li">&#x1F4CB;</span><span class="ll">Software Request</span></a>
-            <a href="https://jsu.sharepoint.com/sites/ditteam/Lists/Approved%20Software%20List/AllItems.aspx" target="_blank" class="lb"><span class="li">&#x2705;</span><span class="ll">Approved Software</span></a>
-            <a href="https://temp-mail.org" target="_blank" class="lb"><span class="li">&#x1F4E7;</span><span class="ll">Temp Mail</span></a>
-          </div>
-        </div>
+  <div class="ticket-list" id="ticketList"></div>
+  <div class="sidebar">
+    <div id="detailPanel">
+      <div class="detail-empty">
+        <div class="icon">📋</div>
+        <div>Select a ticket<br>to view details</div>
       </div>
     </div>
-  </div>
 
-  <!-- 2. AI LAUNCHER -->
-  <div class="panel">
-    <div class="ph"><div class="pdot"></div><div class="ptitle">AI Launcher</div></div>
-    <div class="pb">
-      <div class="ai-launcher">
-        <div class="ai-sel-wrap">
-          <select class="ai-sel" id="ai-sel">
-            <option value="claude">Claude</option>
-            <option value="gemini">Gemini</option>
-            <option value="chatgpt">ChatGPT</option>
-            <option value="grok">Grok</option>
-          </select>
-          <span class="ai-arrow">&#x25BE;</span>
-        </div>
-        <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything - press Enter to open in new tab"/>
-        <button class="ai-go" id="ai-go-btn">ASK</button>
-      </div>
-    </div>
-  </div>
+    <hr>
 
-  <!-- 3. WEATHER + NETWORK -->
-  <div class="info-row">
-    <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">Local Weather &mdash; 36265</div><button class="rbtn" id="wx-refresh">&#x21BB; REFRESH</button></div>
-      <div class="pb" id="weather-body"><div class="nloading">FETCHING WEATHER&hellip;</div></div>
+    <div class="section-label">Stats</div>
+    <div class="stat-grid">
+      <div class="stat-box stat-open"><div class="stat-num" id="statOpen">-</div><div class="stat-label">Open</div></div>
+      <div class="stat-box stat-sched"><div class="stat-num" id="statSched">-</div><div class="stat-label">To Schedule</div></div>
+      <div class="stat-box stat-prog"><div class="stat-num" id="statProg">-</div><div class="stat-label">In Progress</div></div>
+      <div class="stat-box stat-done"><div class="stat-num" id="statDone">-</div><div class="stat-label">Done</div></div>
     </div>
-    <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">Network Info</div><button class="rbtn" id="net-refresh">&#x21BB; REFRESH</button></div>
-      <div class="pb" id="network-body"><div class="nloading">FETCHING NETWORK INFO&hellip;</div></div>
-    </div>
-  </div>
 
-  <!-- 4. SERVICE STATUS -->
-  <div class="panel">
-    <div class="ph"><div class="pdot"></div><div class="ptitle">Service Status</div><button class="rbtn" id="svc-refresh">&#x21BB; REFRESH</button></div>
-    <div class="pb">
-      <div class="svc-issue-banner" id="svc-banner">&#x26A0; One or more services are reporting issues.</div>
-      <div class="svc-grid" id="svc-grid"><div class="nloading">CHECKING SERVICES&hellip;</div></div>
-      <div class="svc-updated" id="svc-updated"></div>
-    </div>
-  </div>
-
-  <!-- 5. DINING HALL / CAFE MENUS — FEATURE #3 -->
-  <div class="panel">
-    <div class="ph"><div class="pdot"></div><div class="ptitle"><a href="https://jsudining.sodexomyway.com/en-us/locations/dining-hall" target="_blank" style="color:inherit;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='inherit'">JAX State Dining Hall &#x2197;</a></div></div>
-    <div class="pb">
-      <div class="cafe-period-indicator" id="cafe-period-indicator" style="margin-bottom:10px;">
-        <div class="cafe-period-dot"></div>
-        <span class="cafe-period-text" id="cafe-period-text">NOW SERVING: ---</span>
-      </div>
-      <div class="cafe-row" id="cafe-row">
-        <div class="nloading" id="cafe-loading">LOADING MENUS&hellip;</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 6. SHIFT LOG + JSU NEWS -->
-  <div class="shift-row">
-    <div class="panel">
-      <div class="ph"><div class="pdot"></div><div class="ptitle">Shift Log</div></div>
-      <div class="pb">
-        <textarea class="shiftlog-ta" id="shiftlog" placeholder="Leave yourself notes - auto-saves as you type"></textarea>
-        <div class="shiftlog-foot">
-          <span class="shiftlog-saved" id="sl-saved">SAVED</span>
-          <button class="shiftlog-clr" id="sl-clear">CLEAR LOG</button>
-        </div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="ph">
-        <div class="pdot"></div>
-        <div class="ptitle">News Feeds</div>
-        <!-- FIX #2: Removed inline onclick — wired via addEventListener inside IIFE -->
-        <button class="rbtn" id="news-toggle-btn" style="margin-left:auto;">&#9881; MANAGE FEEDS</button>
-      </div>
-      <div id="news-config" style="display:none;padding:12px;border-bottom:1px solid var(--bs);">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:8px;">RSS FEED URLS — ONE PER LINE</div>
-        <textarea id="feed-input" style="width:100%;min-height:80px;resize:vertical;background:var(--bg4);border:1px solid var(--bs);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 10px;border-radius:7px;outline:none;line-height:1.7;" placeholder="https://example.com/rss&#10;https://another.com/feed"></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <button id="save-feeds-btn" style="background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:7px 14px;border-radius:6px;cursor:pointer;">SAVE &amp; RELOAD</button>
-          <button id="reset-feeds-btn" style="background:none;border:1px solid var(--bs);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 12px;border-radius:6px;cursor:pointer;letter-spacing:1px;">RESET DEFAULTS</button>
-        </div>
-      </div>
-      <div class="pb" id="jsu-news"><div class="nloading">LOADING NEWS&hellip;</div></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- NEWS TICKER -->
-<div class="ticker-bar" id="ticker-bar">
-  <div class="ticker-label">
-    <span>NEWS</span>
-    <div class="ticker-divider"></div>
-    <button id="ticker-toggle-btn-inner" style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;cursor:pointer;letter-spacing:1px;">HIDE</button>
-  </div>
-  <div class="ticker-wrap">
-    <div class="ticker-track" id="ticker-track">
-      <span class="ticker-item">Loading headlines&hellip;</span>
-    </div>
+    <div class="section-label">Scheduling Needed</div>
+    <div id="schedList"></div>
   </div>
 </div>
-
-<div class="footer">JSU GAMECOCKS IT DASHBOARD // JACKSONVILLE STATE UNIVERSITY // JACKSONVILLE, AL 36265</div>
 
 <script>
-(function(){
-'use strict';
-
-// CLOCK
-function tick(){
-  var n=new Date();
-  document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour12:false});
-  document.getElementById('date').textContent=n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
-}
-tick();
-setInterval(tick,1000);
-
-// THEME
-var htmlEl=document.documentElement;
-var togEl=document.getElementById('theme-toggle');
-var lblEl=document.getElementById('theme-lbl');
-var savedTheme=localStorage.getItem('jsu_theme')||'dark';
-if(savedTheme==='light'){htmlEl.setAttribute('data-theme','light');togEl.checked=true;lblEl.textContent='LIGHT';}
-togEl.addEventListener('change',function(){
-  var t=togEl.checked?'light':'dark';
-  htmlEl.setAttribute('data-theme',t);
-  lblEl.textContent=t.toUpperCase();
-  localStorage.setItem('jsu_theme',t);
-});
-
-// AI LAUNCHER
-var aiSel=document.getElementById('ai-sel');
-var aiInp=document.getElementById('ai-input');
-var aiBtn=document.getElementById('ai-go-btn');
-var savedAI=localStorage.getItem('jsu_ai');
-if(savedAI)aiSel.value=savedAI;
-aiSel.addEventListener('change',function(){localStorage.setItem('jsu_ai',aiSel.value);});
-function launchAI(){
-  var q=aiInp.value.trim();
-  if(!q)return;
-  var maps={
-    claude:'https://claude.ai/new?q='+encodeURIComponent(q),
-    gemini:'https://gemini.google.com/app?q='+encodeURIComponent(q),
-    chatgpt:'https://chatgpt.com/?q='+encodeURIComponent(q),
-    grok:'https://grok.com/?q='+encodeURIComponent(q)
-  };
-  window.open(maps[aiSel.value]||maps.claude,'_blank');
-  aiInp.value='';
-}
-aiInp.addEventListener('keydown',function(e){if(e.key==='Enter')launchAI();});
-aiBtn.addEventListener('click',launchAI);
-
-// WEATHER
-var WI={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌦️',82:'⛈️',95:'⛈️',99:'⛈️'};
-var WD={0:'Clear Sky',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',80:'Rain Showers',81:'Showers',82:'Heavy Showers',95:'Thunderstorm',99:'Hail Storm'};
-function loadWeather(){
-  var el=document.getElementById('weather-body');
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8126&longitude=-85.7616&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature&temperature_unit=fahrenheit&wind_speed_unit=mph')
-  .then(function(r){return r.json();})
-  .then(function(wx){
-    var c=wx.current,code=c.weather_code;
-    el.innerHTML='<div class="weather-loc">JACKSONVILLE, AL 36265</div>'
-      +'<div class="weather-main"><div class="weather-icon">'+(WI[code]||'🌡️')+'</div>'
-      +'<div><div class="weather-temp">'+Math.round(c.temperature_2m)+'<span class="weather-unit">°F</span></div>'
-      +'<div class="weather-desc">'+(WD[code]||'Unknown')+'</div></div></div>'
-      +'<div class="weather-meta">'
-      +'<div class="wm-item"><div class="wm-label">FEELS LIKE</div>'+Math.round(c.apparent_temperature)+'°F</div>'
-      +'<div class="wm-item"><div class="wm-label">HUMIDITY</div>'+c.relative_humidity_2m+'%</div>'
-      +'<div class="wm-item"><div class="wm-label">WIND</div>'+Math.round(c.wind_speed_10m)+' mph</div>'
-      +'<div class="wm-item"><div class="wm-label">CONDITIONS</div>'+(WD[code]||'—')+'</div>'
-      +'</div>';
-  })
-  .catch(function(){el.innerHTML='<div class="nloading">WEATHER UNAVAILABLE</div>';});
-
-  fetch('https://api.weather.gov/alerts/active?point=33.8126,-85.7616')
-  .then(function(r){return r.json();})
-  .then(function(al){
-    var severe=['Tornado Warning','Tornado Watch','Severe Thunderstorm Warning','Flash Flood Warning','Winter Storm Warning','Extreme Wind Warning'];
-    var hits=al.features?al.features.filter(function(f){return severe.indexOf(f.properties.event)>-1;}):[];
-    var banner=document.getElementById('alert-banner');
-    if(hits.length){
-      banner.style.display='block';
-      document.getElementById('alert-text').textContent=hits.map(function(f){return f.properties.event;}).join(' • ');
-    }else{banner.style.display='none';}
-  })
-  .catch(function(){document.getElementById('alert-banner').style.display='none';});
-}
-loadWeather();
-setInterval(loadWeather,900000);
-document.getElementById('wx-refresh').addEventListener('click',loadWeather);
-
-// NETWORK
-function loadNetwork(){
-  var el=document.getElementById('network-body');
-  el.innerHTML='<div class="nloading">FETCHING...</div>';
-  fetch('https://ipapi.co/json/')
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var ua=navigator.userAgent;
-    var br='Unknown';
-    if(ua.indexOf('Firefox')>-1)br='Firefox '+(ua.match(/Firefox\/([\d.]+)/)||['',''])[1];
-    else if(ua.indexOf('Edg')>-1)br='Edge';
-    else if(ua.indexOf('Chrome')>-1)br='Chrome '+(ua.match(/Chrome\/([\d.]+)/)||['',''])[1];
-    else if(ua.indexOf('Safari')>-1)br='Safari';
-    var os='Unknown';
-    if(ua.indexOf('Windows NT 10')>-1)os='Windows 10/11';
-    else if(ua.indexOf('Windows')>-1)os='Windows';
-    else if(ua.indexOf('Mac')>-1)os='macOS';
-    else if(ua.indexOf('Linux')>-1)os='Linux';
-    el.innerHTML='<div class="net-grid">'
-      +'<div class="net-item"><div class="net-label">PUBLIC IP</div><div class="net-value big">'+(d.ip||'N/A')+'</div></div>'
-      +'<div class="net-item"><div class="net-label">ISP / ORG</div><div class="net-value">'+((d.org||'N/A').replace(/^AS\d+ /,''))+'</div></div>'
-      +'<div class="net-item"><div class="net-label">LOCATION</div><div class="net-value">'+(d.city||'')+', '+(d.region||'')+'</div></div>'
-      +'<div class="net-item"><div class="net-label">BROWSER</div><div class="net-value">'+br+'</div></div>'
-      +'<div class="net-item"><div class="net-label">OS</div><div class="net-value">'+os+'</div></div>'
-      +'<div class="net-item"><div class="net-label">RESOLUTION</div><div class="net-value">'+screen.width+'x'+screen.height+'</div></div>'
-      +'</div>';
-  })
-  .catch(function(){el.innerHTML='<div class="nloading">UNAVAILABLE</div>';});
-}
-loadNetwork();
-document.getElementById('net-refresh').addEventListener('click',loadNetwork);
-
-// SERVICE STATUS — FEATURE #4: Added Ellucian
-var SVCS=[
-  {name:'Microsoft 365',url:'https://status.cloud.microsoft/api/status',parse:function(d){return(!d||!d.status||d.status.indicator==='none')?'ok':'warn';}},
-  {name:'Azure',url:'https://azure.status.microsoft/api/status',parse:function(d){return(!d||!d.status||d.status.indicator==='none')?'ok':'warn';}},
-  {name:'Teams',url:'https://status.cloud.microsoft/api/status',parse:function(d){return(!d||!d.status||d.status.indicator==='none')?'ok':'warn';}},
-  {name:'Google Workspace',url:'https://www.googleapis.com/discovery/v1/apis',parse:function(){return'ok';}},
-  {name:'Zoom',url:'https://status.zoom.us/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
-  {name:'Cloudflare',url:'https://www.cloudflarestatus.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
-  {name:'Canvas',url:'https://status.instructure.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
-  {name:'Jamf Cloud',url:'https://status.jamf.com/api/v2/status.json',parse:function(d){return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}},
-  {name:'Ellucian',url:'https://status.elluciancloud.com/api/v2/status.json',parse:function(d){try{return d.status.indicator==='none'?'ok':d.status.indicator==='minor'?'warn':'down';}catch(e){return'ok';}}}
-];
-var SICONS={ok:'✓',warn:'⚠',down:'✕',loading:'…'};
-function checkSvc(s){
-  return fetch(s.url,{mode:'cors',cache:'no-cache'})
-  .then(function(r){return r.ok?r.json():Promise.reject();})
-  .then(function(d){return s.parse(d);})
-  .catch(function(){return'ok';});
-}
-function loadStatus(){
-  var grid=document.getElementById('svc-grid');
-  var banner=document.getElementById('svc-banner');
-  grid.innerHTML=SVCS.map(function(s){
-    return '<div class="svc-chip" id="sc-'+s.name.replace(/\s+/g,'_')+'"><div class="svc-dot loading"></div>'+s.name+'</div>';
-  }).join('');
-  var issue=false;
-  var promises=SVCS.map(function(s){
-    return checkSvc(s).then(function(st){
-      var chip=document.getElementById('sc-'+s.name.replace(/\s+/g,'_'));
-      if(!chip)return;
-      chip.className='svc-chip '+st;
-      chip.innerHTML='<div class="svc-dot '+st+'"></div>'+s.name+' <span style="margin-left:3px;font-size:9px">'+SICONS[st]+'</span>';
-      if(st!=='ok')issue=true;
-    });
-  });
-  Promise.all(promises).then(function(){
-    banner.style.display=issue?'block':'none';
-    document.getElementById('svc-updated').textContent='LAST CHECKED: '+new Date().toLocaleTimeString('en-US',{hour12:false});
-  });
-}
-loadStatus();
-setInterval(loadStatus,300000);
-document.getElementById('svc-refresh').addEventListener('click',loadStatus);
-
-// SHIFT LOG
-var logEl=document.getElementById('shiftlog');
-var slSaved=document.getElementById('sl-saved');
-logEl.value=localStorage.getItem('jsu_shiftlog')||'';
-var slTimer;
-logEl.addEventListener('input',function(){
-  clearTimeout(slTimer);
-  slTimer=setTimeout(function(){
-    localStorage.setItem('jsu_shiftlog',logEl.value);
-    slSaved.classList.add('show');
-    setTimeout(function(){slSaved.classList.remove('show');},2000);
-  },600);
-});
-document.getElementById('sl-clear').addEventListener('click',function(){
-  if(!confirm('Clear your shift log?'))return;
-  logEl.value='';
-  localStorage.removeItem('jsu_shiftlog');
-});
-
-// RSS HELPER — multi-strategy fetch with CORS proxies + client XML parse
-function parseRSSXml(xmlText,limit){
-  limit=limit||8;
-  // Strip any BOM or leading whitespace that can break DOMParser
-  xmlText=xmlText.replace(/^\s*/, '').replace(/^\uFEFF/, '');
-  var parser=new DOMParser();
-  var doc=parser.parseFromString(xmlText,'text/xml');
-  // Check for parse errors
-  var pe=doc.querySelector('parsererror');
-  if(pe)throw new Error('XML parse error: '+pe.textContent.substring(0,80));
-  var items=[];
-  // Try RSS 2.0 <item> tags first, then Atom <entry> tags
-  var nodes=doc.querySelectorAll('item');
-  if(!nodes.length) nodes=doc.querySelectorAll('entry');
-  for(var i=0;i<Math.min(nodes.length,limit);i++){
-    var node=nodes[i];
-    var title='';var link='';var pubDate='';
-    // Title
-    var titleEl=node.querySelector('title');
-    if(titleEl) title=titleEl.textContent||'';
-    // Link — RSS uses <link>text</link>, Atom uses <link href="..."/>
-    var linkEls=node.getElementsByTagName('link');
-    for(var li=0;li<linkEls.length;li++){
-      var le=linkEls[li];
-      var href=le.getAttribute('href');
-      var txt=(le.textContent||'').trim();
-      if(href){link=href;break;}
-      if(txt&&txt.indexOf('http')===0){link=txt;break;}
-    }
-    // Date
-    var dateEl=node.querySelector('pubDate')||node.querySelector('published')||node.querySelector('updated');
-    if(dateEl) pubDate=dateEl.textContent||'';
-    if(title) items.push({title:title.trim(),link:link.trim(),pubDate:pubDate});
+const TICKETS = [
+  {
+    id: "60348",
+    title: "6th Floor Student Machines — Hardwire Request",
+    desc: "AD machines on WiFi are slow to load user profiles. Department wants them hardwired, but no network ports are available. Need to find a solution (patch panel work, switch, or coordinate with networking team).",
+    tags: ["Networking", "AD"],
+    location: "6th Floor",
+    persons: [],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60290",
+    title: "Return Laptop to Daugette Hall",
+    desc: "Return laptop currently in possession to Daugette Hall.",
+    tags: ["Hardware", "Return"],
+    location: "Daugette Hall",
+    persons: [],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60745",
+    title: "ACE Machines — Library Rename, KACE & Health Check",
+    desc: "Find ACE machines in the library. Rename them for Kevin. Update KACE agent/record. Verify they are in good working shape.",
+    tags: ["KACE", "Naming", "Audit"],
+    location: "Library",
+    persons: ["Kevin"],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60737",
+    title: "Enable Secure Boot — Alisha Cantrell",
+    desc: "Enable Secure Boot on Alisha Cantrell's machine. Must be scheduled with her before proceeding.",
+    tags: ["Secure Boot", "BitLocker"],
+    location: "",
+    persons: ["Alisha Cantrell"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60729",
+    title: "Enable Secure Boot — John Upchurch (Machine + Lib Circ 2)",
+    desc: "Enable Secure Boot on both John Upchurch's personal machine AND the Lib Circ 2 machine. Needs to be scheduled with John.",
+    tags: ["Secure Boot", "BitLocker"],
+    location: "Library Circ 2",
+    persons: ["John Upchurch"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60714",
+    title: "Enable Secure Boot — Lisa Gowens",
+    desc: "Enable Secure Boot on Lisa Gowens's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Lisa Gowens"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60713",
+    title: "Enable Secure Boot — Debrah Fragoso",
+    desc: "Enable Secure Boot on Debrah Fragoso's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Debrah Fragoso"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60710",
+    title: "Enable Secure Boot — Allyson Spivey",
+    desc: "Enable Secure Boot on Allyson Spivey's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Allyson Spivey"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60709",
+    title: "Enable Secure Boot — Jodi Poe",
+    desc: "Enable Secure Boot on Jodi Poe's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Jodi Poe"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60705",
+    title: "Enable Secure Boot — Delores Collier",
+    desc: "Enable Secure Boot on Delores Collier's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Delores Collier"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60699",
+    title: "Enable Secure Boot — Susan Wiggins",
+    desc: "Enable Secure Boot on Susan Wiggins's machine.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Susan Wiggins"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60681",
+    title: "Enable Secure Boot — Arlene Brothers (machine w/ Angie Griffin)",
+    desc: "Enable Secure Boot for Arlene Brothers. Note: Angie Griffin currently has the machine — coordinate accordingly.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Arlene Brothers", "Angie Griffin"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60435",
+    title: "Rebecca Roberts — Surface Hub 2S Teams Call Drops at ~30 Min",
+    desc: "Rebecca Roberts has a Surface Hub 2S running standard Windows 11. During Teams calls, the call disconnects after ~30 minutes. She uses it for Teams calls all day. Investigate: Teams timeout settings, network drops, Windows power/sleep settings, Teams app version, and Surface Hub-specific quirks on standard Win11.",
+    tags: ["Teams", "Surface Hub", "Windows 11"],
+    location: "",
+    persons: ["Rebecca Roberts"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60411",
+    title: "Biology Computer to Daugette — Send Order Info to Rebecca & Lori",
+    desc: "Take old biology computer to Daugette Hall. Then send Rebecca and Lori the information they need to order a replacement machine.",
+    tags: ["Hardware", "Procurement"],
+    location: "Daugette Hall",
+    persons: ["Rebecca", "Lori"],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60526",
+    title: "Enable Secure Boot — Mary Bevis",
+    desc: "Enable Secure Boot on Mary Bevis's machine. Schedule with her before proceeding.",
+    tags: ["Secure Boot"],
+    location: "",
+    persons: ["Mary Bevis"],
+    needsScheduling: true,
+    status: "needs-scheduling",
+    notes: ""
+  },
+  {
+    id: "60740",
+    title: "6th Floor Laptop Cart — JSUDK6Q533",
+    desc: "Work order for the 6th floor laptop cart. Asset tag: JSUDK6Q533. Verify details and complete any required tasks for this machine.",
+    tags: ["Hardware", "Laptop Cart"],
+    location: "6th Floor",
+    persons: [],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60674",
+    title: "ACE303-09 — Inventory with KACE (Runkbot 4.0)",
+    desc: "Machine ACE303-09 needs to be inventoried and registered in KACE. Use Runkbot 4.0 to complete the inventory process.",
+    tags: ["KACE", "Inventory", "Runkbot"],
+    location: "ACE303",
+    persons: [],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
+  },
+  {
+    id: "60743",
+    title: "Enable Secure Boot — JSU7TKP533 (6th Floor)",
+    desc: "Enable Secure Boot on the 6th floor machine with asset tag JSU7TKP533.",
+    tags: ["Secure Boot"],
+    location: "6th Floor",
+    persons: [],
+    needsScheduling: false,
+    status: "open",
+    notes: ""
   }
-  if(!items.length)throw new Error('No items found in feed');
-  return items;
-}
-
-// Fetch with a timeout wrapper
-function fetchWithTimeout(url,opts,ms){
-  ms=ms||8000;
-  return new Promise(function(resolve,reject){
-    var timer=setTimeout(function(){reject(new Error('Timeout'));},ms);
-    fetch(url,opts||{}).then(function(r){
-      clearTimeout(timer);resolve(r);
-    }).catch(function(e){
-      clearTimeout(timer);reject(e);
-    });
-  });
-}
-
-// Strategy A: allorigins.win /raw endpoint — PROVEN RELIABLE
-function fetchViaAllOriginsRaw(url,limit){
-  return fetchWithTimeout('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
-  .then(function(r){
-    if(!r.ok)throw new Error('allorigins-raw HTTP '+r.status);
-    return r.text();
-  })
-  .then(function(text){return parseRSSXml(text,limit);});
-}
-
-// Strategy B: allorigins.win /get endpoint (JSON wrapper)
-function fetchViaAllOrigins(url,limit){
-  return fetchWithTimeout('https://api.allorigins.win/get?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
-  .then(function(r){
-    if(!r.ok)throw new Error('allorigins HTTP '+r.status);
-    return r.json();
-  })
-  .then(function(j){
-    if(!j.contents)throw new Error('allorigins: empty contents');
-    return parseRSSXml(j.contents,limit);
-  });
-}
-
-// Strategy C: Direct fetch (works for same-origin or CORS-enabled feeds)
-function fetchViaDirect(url,limit){
-  return fetchWithTimeout(url,{cache:'no-cache'},10000)
-  .then(function(r){
-    if(!r.ok)throw new Error('direct HTTP '+r.status);
-    return r.text();
-  })
-  .then(function(text){return parseRSSXml(text,limit);});
-}
-
-// Strategy D: rss2json.com API (no count param — requires API key now)
-function fetchViaRss2Json(url){
-  return fetchWithTimeout('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),{},10000)
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.status!=='ok')throw new Error('rss2json: '+(d.message||'unknown error'));
-    return d.items;
-  });
-}
-
-// Master fetch: try each strategy in sequence, stop at first success
-function fetchRSS(url,limit){
-  limit=limit||8;
-  var strategies=[
-    function(){return fetchViaAllOriginsRaw(url,limit);},
-    function(){return fetchViaAllOrigins(url,limit);},
-    function(){return fetchViaDirect(url,limit);},
-    function(){return fetchViaRss2Json(url);}
-  ];
-  var idx=0;
-  function tryNext(){
-    if(idx>=strategies.length)return Promise.reject(new Error('All '+strategies.length+' fetch strategies failed for: '+url));
-    var fn=strategies[idx];idx++;
-    return fn().catch(function(e){
-      console.warn('RSS strategy '+idx+'/'+strategies.length+' failed for '+url+':',e.message);
-      return tryNext();
-    });
-  }
-  return tryNext();
-}
-
-function cleanTitle(t){
-  return t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,'').trim();
-}
-
-// NEWS FEEDS — CONFIGURABLE
-var DEFAULT_FEED_URLS=[
-  'https://www.annistonstar.com/search/?f=rss&t=article&l=25&s=start_time&sd=desc'
 ];
 
-function getSavedFeeds(){
-  try{
-    var s=localStorage.getItem('jsu_feeds');
-    if(s){var arr=JSON.parse(s);if(arr&&arr.length)return arr;}
-  }catch(e){}
-  return DEFAULT_FEED_URLS;
-}
-
-function getTagForUrl(url){
-  if(url.indexOf('annistonstar')>-1)return 'ANNISTON STAR';
-  try{return new URL(url).hostname.replace('www.','').split('.')[0].toUpperCase();}
-  catch(e){return 'NEWS';}
-}
-
-// FIX #2: All feed management functions wired via addEventListener (not inline onclick)
-function toggleNewsConfig(){
-  var cfg=document.getElementById('news-config');
-  var inp=document.getElementById('feed-input');
-  if(cfg.style.display==='none'||cfg.style.display===''){
-    cfg.style.display='block';
-    inp.value=getSavedFeeds().join('\n');
-  }else{
-    cfg.style.display='none';
-  }
-}
-
-function saveFeeds(){
-  var inp=document.getElementById('feed-input');
-  var lines=inp.value.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
-  if(!lines.length){alert('Please enter at least one RSS feed URL.');return;}
-  localStorage.setItem('jsu_feeds',JSON.stringify(lines));
-  document.getElementById('news-config').style.display='none';
-  loadNewsPanel();
-  loadTicker();
-}
-
-function resetFeeds(){
-  localStorage.removeItem('jsu_feeds');
-  document.getElementById('news-config').style.display='none';
-  loadNewsPanel();
-  loadTicker();
-}
-
-// Wire up all feed management buttons via addEventListener
-document.getElementById('news-toggle-btn').addEventListener('click', toggleNewsConfig);
-document.getElementById('save-feeds-btn').addEventListener('click', saveFeeds);
-document.getElementById('reset-feeds-btn').addEventListener('click', resetFeeds);
-
-function renderNews(items,elId){
-  var el=document.getElementById(elId);
-  if(!items||!items.length){el.innerHTML='<div class="nloading">NO STORIES FOUND</div>';return;}
-  el.innerHTML='<div class="news-list">'+items.map(function(i){
-    var date=i.pubDate?new Date(i.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
-    return '<div class="ni"><a href="'+i.link+'" target="_blank">'
-      +'<div class="nh"><span class="src-tag">'+i.tag+'</span>'+i.title+'</div>'
-      +'<div class="nm">'+date+'</div>'
-      +'</a></div>';
-  }).join('')+'</div>';
-}
-
-function loadNewsPanel(){
-  var el=document.getElementById('jsu-news');
-  el.innerHTML='<div class="nloading">LOADING...</div>';
-  var urls=getSavedFeeds();
-  var allItems=[];
-  var failedUrls=[];
-  var promises=urls.map(function(url){
-    var tag=getTagForUrl(url);
-    return fetchRSS(url,5)
-    .then(function(items){
-      items.forEach(function(i){
-        allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag,pubDate:i.pubDate});
+// Load saved state from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('it_tickets_v1');
+    if (saved) {
+      const data = JSON.parse(saved);
+      data.forEach(s => {
+        const t = TICKETS.find(t => t.id === s.id);
+        if (t) { t.status = s.status; t.notes = s.notes; }
       });
-    })
-    .catch(function(err){
-      failedUrls.push(url);
-    });
-  });
-  Promise.all(promises).then(function(){
-    if(!allItems.length){
-      var msg='No stories found.';
-      if(failedUrls.length){
-        msg+=' Failed to fetch '+failedUrls.length+' feed(s):<br>'
-          +failedUrls.map(function(u){return '<span style="color:var(--red);font-size:10px;word-break:break-all;">'+u+'</span>';}).join('<br>');
-        msg+='<br><span style="opacity:.6;font-size:9px;margin-top:6px;display:inline-block;">Tip: Make sure URLs point to a valid RSS/Atom XML feed.</span>';
-      }
-      el.innerHTML='<div class="nloading" style="text-align:left;padding:14px;">'+msg+'</div>';
-      return;
     }
-    allItems.sort(function(a,b){return new Date(b.pubDate)-new Date(a.pubDate);});
-    renderNews(allItems.slice(0,10),'jsu-news');
-    // Subtle warning if some feeds failed but others worked
-    if(failedUrls.length){
-      var warn=document.createElement('div');
-      warn.style.cssText='font-family:"Share Tech Mono",monospace;font-size:9px;color:#f39c12;opacity:.7;padding:6px 10px 0;letter-spacing:1px;';
-      warn.textContent='⚠ '+failedUrls.length+' FEED(S) FAILED TO LOAD';
-      el.appendChild(warn);
-    }
-  });
+  } catch(e) {}
 }
-loadNewsPanel();
 
-// TICKER TOGGLE
-var tickerVisible=(localStorage.getItem('jsu_ticker')!=='hidden');
-function applyTickerState(){
-  var bar=document.getElementById('ticker-bar');
-  var btn=document.getElementById('ticker-toggle-btn-inner');
-  if(tickerVisible){
-    bar.style.height='36px';
-    bar.style.borderTopWidth='1px';
-    bar.style.overflow='hidden';
-    btn.textContent='HIDE';
-  }else{
-    bar.style.height='0px';
-    bar.style.borderTopWidth='0px';
-    btn.textContent='SHOW';
+function saveState() {
+  const data = TICKETS.map(t => ({ id: t.id, status: t.status, notes: t.notes }));
+  localStorage.setItem('it_tickets_v1', JSON.stringify(data));
+}
+
+let currentFilter = 'all';
+let selectedId = null;
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function statusLabel(s) {
+  const map = { 'open': 'Open', 'in-progress': 'In Progress', 'needs-scheduling': 'Needs Scheduling', 'done': 'Done' };
+  return map[s] || s;
+}
+
+function pillClass(s) {
+  const map = { 'open': 'pill-open', 'in-progress': 'pill-in-progress', 'needs-scheduling': 'pill-needs-scheduling', 'done': 'pill-done' };
+  return map[s] || '';
+}
+
+function renderList() {
+  const list = document.getElementById('ticketList');
+  const filtered = currentFilter === 'all' ? TICKETS : TICKETS.filter(t => t.status === currentFilter);
+
+  list.innerHTML = '';
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:40px 0;text-align:center;">No tickets in this category.</div>';
+    return;
   }
-}
-function toggleTicker(){
-  tickerVisible=!tickerVisible;
-  localStorage.setItem('jsu_ticker',tickerVisible?'visible':'hidden');
-  applyTickerState();
-}
-document.getElementById('ticker-toggle-btn-inner').addEventListener('click', toggleTicker);
-applyTickerState();
 
-function loadTicker(){
-  var track=document.getElementById('ticker-track');
-  var urls=getSavedFeeds();
-  var allItems=[];
-  var failCount=0;
-  var promises=urls.map(function(url){
-    var tag=getTagForUrl(url);
-    return fetchRSS(url,5)
-    .then(function(items){
-      items.forEach(function(i){
-        allItems.push({title:cleanTitle(i.title),link:i.link,tag:tag});
-      });
-    })
-    .catch(function(){failCount++;});
+  filtered.forEach(t => {
+    const el = document.createElement('div');
+    el.className = `ticket status-${t.status}${selectedId === t.id ? ' selected' : ''}`;
+    el.onclick = () => selectTicket(t.id);
+
+    const personTags = t.persons.map(p => `<span class="tag tag-person">👤 ${p}</span>`).join('');
+    const locTag = t.location ? `<span class="tag tag-location">📍 ${t.location}</span>` : '';
+    const typeTags = t.tags.map(g => `<span class="tag">${g}</span>`).join('');
+
+    el.innerHTML = `
+      <div class="ticket-header">
+        <div>
+          <div class="ticket-id">#${t.id}</div>
+          <div class="ticket-title">${t.title}</div>
+        </div>
+        <span class="status-pill ${pillClass(t.status)}">${statusLabel(t.status)}</span>
+      </div>
+      <div class="ticket-meta">
+        ${personTags}${locTag}${typeTags}
+      </div>
+    `;
+    list.appendChild(el);
   });
-  Promise.all(promises).then(function(){
-    if(!allItems.length){
-      var msg=failCount?'RSS feeds failed to load — check your feed URLs in Manage Feeds':'Add RSS feeds via the Manage Feeds button in the News panel';
-      allItems=[{title:msg,link:'#',tag:failCount?'ERROR':'INFO'}];
-    }
-    var doubled=allItems.concat(allItems);
-    var html=doubled.map(function(i){
-      return '<a class="ticker-item" href="'+i.link+'" target="_blank">'
-        +'<span class="ticker-badge">'+i.tag+'</span>'
-        +i.title
-        +'</a><span class="ticker-sep">&#x25CF;</span>';
-    }).join('');
-    track.innerHTML=html;
-    var speed=Math.max(45,doubled.length*4);
-    track.style.animationDuration=speed+'s';
-  });
+
+  updateStats();
 }
-loadTicker();
-setInterval(loadTicker,1200000);
 
+function selectTicket(id) {
+  selectedId = id;
+  const t = TICKETS.find(t => t.id === id);
+  renderList();
 
-// ====================================================================
-// FEATURE #3: DINING HALL / CAFE MENU — Persistent Card System
-// ====================================================================
-(function initCafeMenus(){
+  const panel = document.getElementById('detailPanel');
 
-  // Meal period schedule (Central Time — JSU is in CT)
-  var MEAL_PERIODS=[
-    {name:'Breakfast',  startH:6, startM:30, endH:10,endM:0,  emoji:'🌅'},
-    {name:'Lunch',      startH:10,startM:30, endH:14,endM:0,  emoji:'☀️'},
-    {name:'Afternoon',  startH:14,startM:0,  endH:16,endM:30, emoji:'🌤️'},
-    {name:'Dinner',     startH:16,startM:30, endH:20,endM:30, emoji:'🌙'},
-    {name:'Late Night', startH:20,startM:30, endH:23,endM:59, emoji:'🌃'}
-  ];
+  const personRows = t.persons.map(p => `<div class="person-row"><div class="person-dot"></div>${p}</div>`).join('');
 
-  function getCurrentMealPeriod(){
-    var now=new Date();
-    var mins=now.getHours()*60+now.getMinutes();
-    for(var i=0;i<MEAL_PERIODS.length;i++){
-      var p=MEAL_PERIODS[i];
-      var start=p.startH*60+p.startM;
-      var end=p.endH*60+p.endM;
-      if(mins>=start&&mins<=end)return{current:p,nextIdx:(i+1)%MEAL_PERIODS.length};
-    }
-    // Before breakfast or after late night — show next breakfast
-    return{current:null,nextIdx:0};
+  panel.innerHTML = `
+    <div class="detail-card active">
+      <div class="detail-ticket-id">#${t.id}</div>
+      <div class="detail-title">${t.title}</div>
+
+      <div class="detail-section">
+        <div class="detail-section-label">Description</div>
+        <div class="detail-desc">${t.desc}</div>
+      </div>
+
+      ${t.persons.length ? `
+      <div class="detail-section">
+        <div class="detail-section-label">People Involved</div>
+        <div class="people-list">${personRows}</div>
+      </div>` : ''}
+
+      ${t.location ? `
+      <div class="detail-section">
+        <div class="detail-section-label">Location</div>
+        <div class="detail-desc">📍 ${t.location}</div>
+      </div>` : ''}
+
+      <div class="detail-section">
+        <div class="detail-section-label">Status</div>
+        <select class="status-select" id="statusSel_${t.id}" onchange="updateStatus('${t.id}')">
+          <option value="open" ${t.status==='open'?'selected':''}>Open</option>
+          <option value="needs-scheduling" ${t.status==='needs-scheduling'?'selected':''}>Needs Scheduling</option>
+          <option value="in-progress" ${t.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="done" ${t.status==='done'?'selected':''}>Done ✓</option>
+        </select>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-label">Notes</div>
+        <textarea class="notes-area" id="notes_${t.id}" placeholder="Add notes, time scheduled, steps taken...">${t.notes}</textarea>
+        <button class="save-btn" onclick="saveNotes('${t.id}')">Save Notes</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateStatus(id) {
+  const t = TICKETS.find(t => t.id === id);
+  t.status = document.getElementById(`statusSel_${id}`).value;
+  saveState();
+  renderList();
+  updateStats();
+  renderScheduleList();
+}
+
+function saveNotes(id) {
+  const t = TICKETS.find(t => t.id === id);
+  t.notes = document.getElementById(`notes_${id}`).value;
+  saveState();
+  const btn = event.target;
+  btn.textContent = 'Saved ✓';
+  btn.style.background = 'var(--accent3)';
+  btn.style.color = '#0d1a12';
+  setTimeout(() => { btn.textContent = 'Save Notes'; btn.style.background = ''; btn.style.color = ''; }, 1500);
+}
+
+function updateStats() {
+  const counts = { open: 0, 'needs-scheduling': 0, 'in-progress': 0, done: 0 };
+  TICKETS.forEach(t => counts[t.status]++);
+  document.getElementById('statOpen').textContent = counts['open'];
+  document.getElementById('statSched').textContent = counts['needs-scheduling'];
+  document.getElementById('statProg').textContent = counts['in-progress'];
+  document.getElementById('statDone').textContent = counts['done'];
+
+  const done = counts['done'];
+  const total = TICKETS.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done}/${total}`;
+}
+
+function renderScheduleList() {
+  const sched = TICKETS.filter(t => t.needsScheduling && t.status !== 'done');
+  const el = document.getElementById('schedList');
+  if (sched.length === 0) {
+    el.innerHTML = '<div style="color:var(--accent3);font-family:var(--mono);font-size:11px;">All scheduling done! 🎉</div>';
+    return;
   }
+  el.innerHTML = sched.map(t => `
+    <div class="schedule-item" onclick="selectTicket('${t.id}')" style="cursor:pointer">
+      <div class="sched-dot"></div>
+      <div>
+        <div class="sched-name">${t.persons[0] || 'TBD'}</div>
+        <div class="sched-tick">#${t.id}</div>
+      </div>
+    </div>
+  `).join('');
+}
 
-  // Jack Hopper Dining Hall menu data
-  var JACK_HOPPER={
-    name:'JAX State Dining Hall',
-    icon:'🍽️',
-    meals:{
-      'Breakfast':  [{station:'Grill',items:['Scrambled Eggs','Bacon','Sausage Patty','Hash Browns','Pancakes']},{station:'Bakery',items:['Biscuits & Gravy','Muffins','Toast','Fruit Cup']},{station:'Beverages',items:['Coffee','Orange Juice','Milk','Hot Tea']}],
-      'Lunch':      [{station:'Entree',items:['Grilled Chicken','BBQ Pulled Pork','Baked Fish Fillet']},{station:'Sides',items:['Mac & Cheese','Green Beans','Mashed Potatoes','Cornbread']},{station:'Salad Bar',items:['Mixed Greens','Tomatoes','Cucumbers','Ranch','Italian']},{station:'Dessert',items:['Brownies','Cookies','Soft Serve']}],
-      'Afternoon':  [{station:'Lite Fare',items:['Chicken Tenders','Fries','Onion Rings']},{station:'Grab & Go',items:['Wraps','Fruit','Chips','Bottled Water']}],
-      'Dinner':     [{station:'Entree',items:['Roast Beef','Chicken Alfredo','Vegetable Stir-Fry']},{station:'Sides',items:['Rice Pilaf','Steamed Broccoli','Dinner Roll','Baked Potato']},{station:'Dessert',items:['Cake Slice','Pudding','Fresh Fruit']}],
-      'Late Night': [{station:'Late Bites',items:['Pizza Slices','Chicken Wings','Mozzarella Sticks']},{station:'Beverages',items:['Fountain Drinks','Coffee','Hot Chocolate']}]
-    }
-  };
-
-  function getMealName(){
-    var mp=getCurrentMealPeriod();
-    if(mp.current) return mp.current.name;
-    return MEAL_PERIODS[mp.nextIdx].name;
-  }
-
-  function formatTime12(h,m){
-    var ampm=h>=12?'PM':'AM';
-    var h12=h%12; if(h12===0)h12=12;
-    return h12+':'+(m<10?'0':'')+m+' '+ampm;
-  }
-
-  function updatePeriodIndicator(){
-    var mp=getCurrentMealPeriod();
-    var dotEl=document.querySelector('#cafe-period-indicator .cafe-period-dot');
-    var textEl=document.getElementById('cafe-period-text');
-    if(mp.current){
-      dotEl.style.background='#2ecc71';
-      dotEl.style.boxShadow='0 0 5px #2ecc71';
-      var endStr=formatTime12(mp.current.endH,mp.current.endM);
-      textEl.textContent='NOW SERVING: '+mp.current.emoji+' '+mp.current.name.toUpperCase()+' (until '+endStr+')';
-      textEl.style.color='#2ecc71';
-    }else{
-      dotEl.style.background='#f39c12';
-      dotEl.style.boxShadow='0 0 5px #f39c12';
-      var next=MEAL_PERIODS[mp.nextIdx];
-      var startStr=formatTime12(next.startH,next.startM);
-      textEl.textContent='BETWEEN MEALS \u2014 NEXT: '+next.emoji+' '+next.name.toUpperCase()+' at '+startStr;
-      textEl.style.color='#f39c12';
-    }
-  }
-
-  function renderCafeCard(){
-    var row=document.getElementById('cafe-row');
-    var meal=getMealName();
-    var loc=JACK_HOPPER;
-    var mealData=loc.meals[meal]||[];
-    var stationsHTML='';
-    for(var s=0;s<mealData.length;s++){
-      var st=mealData[s];
-      var itemsHTML=st.items.map(function(item){return '<span class="cafe-item">'+item+'</span>';}).join('');
-      stationsHTML+='<div class="cafe-station"><div class="cafe-station-name">'+st.station+'</div><div class="cafe-items">'+itemsHTML+'</div></div>';
-    }
-    if(!mealData.length){
-      stationsHTML='<div class="nloading" style="padding:12px 0;">No menu data for this period</div>';
-    }
-    row.innerHTML='<div class="cafe-card" style="grid-column:1/-1;">'
-      +'<div class="cafe-card-body">'+stationsHTML+'</div>'
-      +'</div>';
-  }
-
-  updatePeriodIndicator();
-  renderCafeCard();
-
-  // Refresh period indicator every minute; re-render card if meal period changes
-  var lastMeal=getMealName();
-  setInterval(function(){
-    updatePeriodIndicator();
-    var newMeal=getMealName();
-    if(lastMeal!==newMeal){lastMeal=newMeal;renderCafeCard();}
-  },60000);
-
-})();
-
-})();
+// Init
+loadState();
+renderList();
+updateStats();
+renderScheduleList();
 </script>
 </body>
 </html>
