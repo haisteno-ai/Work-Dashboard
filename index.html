@@ -700,7 +700,10 @@ function renderFeedList(){
   }).join('');
   list.querySelectorAll('.feed-del').forEach(function(el){
     el.addEventListener('click',function(){
-      var uf=getUserFeeds();uf.splice(parseInt(el.dataset.fi),1);saveUserFeeds(uf);renderFeedList();loadHeadlineRibbon();
+      var uf=getUserFeeds();uf.splice(parseInt(el.dataset.fi),1);saveUserFeeds(uf);
+      // Remove from cache too
+      var cache=getRSSCache();delete cache[uf.url];saveRSSCache(cache);
+      renderFeedList();renderFromCache();
     });
   });
   // Test buttons — check individual feed and show green/red dot
@@ -714,26 +717,38 @@ function renderFeedList(){
       el.textContent='...';
       fetchRSS(feed.url,2).then(function(items){
         dot.style.background='var(--green)';dot.style.boxShadow='0 0 4px var(--green)';
-        dot.title='Working — '+items.length+' items';
+        dot.title='Working \u2014 '+items.length+' items';
         el.textContent='\u2713';el.style.color='var(--green)';
       }).catch(function(){
         dot.style.background='var(--red-alert)';dot.style.boxShadow='0 0 4px var(--red-alert)';
-        dot.title='Failed — check URL';
+        dot.title='Failed \u2014 check URL';
         el.textContent='\u2715';el.style.color='var(--red-alert)';
       });
     });
   });
-  // Auto-test all feeds on render
+  // Show cached status immediately (no network hit)
+  var cache=getRSSCache();
   userFeeds.forEach(function(f,i){
     var dot=document.getElementById('feed-dot-'+i);
     var testEl=list.querySelector('.feed-test[data-fi="'+i+'"]');
-    fetchRSS(f.url,1).then(function(){
-      if(dot){dot.style.background='var(--green)';dot.style.boxShadow='0 0 4px var(--green)';dot.title='Working';}
+    var c=cache[f.url];
+    if(c&&c.items&&c.items.length&&!c.error){
+      // Has cached data and no error
+      if(dot){dot.style.background='var(--green)';dot.style.boxShadow='0 0 4px var(--green)';
+        var age=Date.now()-c.ts;
+        var mins=Math.round(age/60000);
+        dot.title='Cached \u2014 '+c.items.length+' items ('+mins+'m ago)';}
       if(testEl){testEl.textContent='\u2713';testEl.style.color='var(--green)';}
-    }).catch(function(){
+    }else if(c&&c.error&&c.items&&c.items.length){
+      // Has stale cached data
+      if(dot){dot.style.background='var(--yellow)';dot.style.boxShadow='0 0 4px var(--yellow)';dot.title='Stale \u2014 last refresh failed';}
+      if(testEl){testEl.textContent='!';testEl.style.color='var(--yellow)';}
+    }else if(c&&c.error){
+      // Failed, no cached data
       if(dot){dot.style.background='var(--red-alert)';dot.style.boxShadow='0 0 4px var(--red-alert)';dot.title='Failed';}
       if(testEl){testEl.textContent='\u2715';testEl.style.color='var(--red-alert)';}
-    });
+    }
+    // else: never tested, stays gray
   });
 }
 document.getElementById('add-feed-btn').addEventListener('click',function(){
@@ -743,7 +758,9 @@ document.getElementById('add-feed-btn').addEventListener('click',function(){
   if(url.indexOf('http')!==0)url='https://'+url;
   var uf=getUserFeeds();uf.push({url:url,label:name});saveUserFeeds(uf);
   document.getElementById('add-feed-url').value='';document.getElementById('add-feed-name').value='';
-  renderFeedList();loadHeadlineRibbon();
+  renderFeedList();
+  // Fetch just this one feed immediately — won't hit rate limit
+  fetchSingleFeedNow({url:url,label:name});
 });
 
 // ══════════════════════════════════
@@ -1006,8 +1023,24 @@ document.getElementById('svc-refresh').addEventListener('click',loadStatus);
 })();
 
 // ══════════════════════════════════
-// RSS ENGINE
+// RSS ENGINE — CACHED + STAGGERED
 // ══════════════════════════════════
+// Problem: allorigins proxy rate-limits parallel requests, so fetching
+// all feeds at once works the first time then they all 429.
+// Solution: cache results in localStorage, render from cache instantly,
+// refresh feeds ONE AT A TIME in the background with delays.
+
+var RSS_CACHE_KEY='jsu_rss_cache';
+var RSS_CACHE_MAX_AGE=30*60*1000; // 30 min — consider stale after this
+var RSS_FETCH_DELAY=4000; // 4 sec between each feed refresh
+
+function getRSSCache(){
+  try{return JSON.parse(localStorage.getItem(RSS_CACHE_KEY))||{};}catch(e){return{};}
+}
+function saveRSSCache(c){
+  try{localStorage.setItem(RSS_CACHE_KEY,JSON.stringify(c));}catch(e){}
+}
+
 function parseRSS(xml,limit){
   limit=limit||8;xml=xml.replace(/^\s*/,'').replace(/^\uFEFF/,'');
   var doc=new DOMParser().parseFromString(xml,'text/xml');
@@ -1033,20 +1066,18 @@ function fetchWithTimeout(url,opts,ms){
     fetch(url,opts||{}).then(function(r){clearTimeout(t);res(r);}).catch(function(e){clearTimeout(t);rej(e);});
   });
 }
+// Single feed fetch — tries multiple proxy strategies
 function fetchRSS(url,limit){
   limit=limit||8;
-  // Strategy 1: allorigins raw
   return fetchWithTimeout('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
     .then(function(r){if(!r.ok)throw new Error('');return r.text();})
     .then(function(t){return parseRSS(t,limit);})
     .catch(function(){
-      // Strategy 2: allorigins get
       return fetchWithTimeout('https://api.allorigins.win/get?url='+encodeURIComponent(url),{cache:'no-cache'},12000)
         .then(function(r){if(!r.ok)throw new Error('');return r.json();})
         .then(function(j){if(!j.contents)throw new Error('');return parseRSS(j.contents,limit);});
     })
     .catch(function(){
-      // Strategy 3: direct
       return fetchWithTimeout(url,{cache:'no-cache'},10000)
         .then(function(r){if(!r.ok)throw new Error('');return r.text();})
         .then(function(t){return parseRSS(t,limit);});
@@ -1054,38 +1085,114 @@ function fetchRSS(url,limit){
 }
 function cleanTitle(t){return t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,'').trim();}
 
-function loadHeadlineRibbon(){
-  var track=document.getElementById('hr-track');
-  var feeds=getAllFeeds();var all=[];var failedFeeds=[];
-  if(!feeds.length){track.innerHTML='<span class="hr-item">Add RSS feeds in Settings to see headlines here</span>';return;}
-  var promises=feeds.map(function(feed){
-    return fetchRSS(feed.url,5).then(function(items){
-      items.forEach(function(i){all.push({title:cleanTitle(i.title),link:i.link,tag:feed.label,isError:false});});
-    }).catch(function(){
-      failedFeeds.push(feed.label);
-    });
-  });
-  Promise.all(promises).then(function(){
-    // Add error indicators for failed feeds so they show inline
-    failedFeeds.forEach(function(label){
-      all.push({title:'\u26A0 Feed failed to load',link:'#',tag:label,isError:true});
-    });
-    if(!all.length){all=[{title:'No feeds configured',link:'#',tag:'INFO',isError:true}];}
-    var doubled=all.concat(all);
-    track.innerHTML=doubled.map(function(i){
-      if(i.isError){
-        return '<span class="hr-item" style="color:var(--yellow);opacity:.7;cursor:default;">'
-          +'<span class="hr-badge" style="background:rgba(243,156,18,.12);color:var(--yellow);border-color:rgba(243,156,18,.3);">'+i.tag+'</span>'
-          +i.title+'</span>';
-      }
-      return '<a class="hr-item" href="'+i.link+'" target="_blank"><span class="hr-badge">'+i.tag+'</span>'+i.title+'</a>';
-    }).join('');
-    track.style.animationDuration=Math.max(50,doubled.length*4)+'s';
+// Fetch a single feed, update cache, return items
+function fetchAndCacheFeed(feed){
+  return fetchRSS(feed.url,6).then(function(items){
+    var cleaned=items.map(function(i){return{title:cleanTitle(i.title),link:i.link,pubDate:i.pubDate};});
+    var cache=getRSSCache();
+    cache[feed.url]={items:cleaned,label:feed.label,ts:Date.now(),error:false};
+    saveRSSCache(cache);
+    return{label:feed.label,items:cleaned,error:false};
+  }).catch(function(){
+    var cache=getRSSCache();
+    // Mark error but keep old cached items if they exist
+    if(cache[feed.url]){
+      cache[feed.url].error=true;
+      cache[feed.url].label=feed.label;
+      saveRSSCache(cache);
+      return{label:feed.label,items:cache[feed.url].items||[],error:true,stale:true};
+    }
+    cache[feed.url]={items:[],label:feed.label,ts:Date.now(),error:true};
+    saveRSSCache(cache);
+    return{label:feed.label,items:[],error:true,stale:false};
   });
 }
 
-loadHeadlineRibbon();
-setInterval(loadHeadlineRibbon,900000);
+// Render the headline ribbon from whatever data we have
+function renderRibbon(feedResults){
+  var track=document.getElementById('hr-track');
+  var all=[];var errors=[];
+  feedResults.forEach(function(fr){
+    fr.items.forEach(function(i){
+      all.push({title:i.title,link:i.link,tag:fr.label,isError:false});
+    });
+    if(fr.error){
+      var msg=fr.stale?'\u26A0 Showing cached \u2014 refresh failed':'\u26A0 Feed failed to load';
+      errors.push({title:msg,link:'#',tag:fr.label,isError:true});
+    }
+  });
+  // Put errors at the end so they don't dominate
+  all=all.concat(errors);
+  if(!all.length){all=[{title:'No feeds configured \u2014 add them in Settings',link:'#',tag:'INFO',isError:true}];}
+  var doubled=all.concat(all);
+  track.innerHTML=doubled.map(function(i){
+    if(i.isError){
+      return '<span class="hr-item" style="color:var(--yellow);opacity:.7;cursor:default;">'
+        +'<span class="hr-badge" style="background:rgba(243,156,18,.12);color:var(--yellow);border-color:rgba(243,156,18,.3);">'+i.tag+'</span>'
+        +i.title+'</span>';
+    }
+    return '<a class="hr-item" href="'+i.link+'" target="_blank"><span class="hr-badge">'+i.tag+'</span>'+i.title+'</a>';
+  }).join('');
+  track.style.animationDuration=Math.max(50,doubled.length*4)+'s';
+}
+
+// Build results from cache (instant render)
+function renderFromCache(){
+  var feeds=getAllFeeds();
+  if(!feeds.length){
+    renderRibbon([]);return;
+  }
+  var cache=getRSSCache();
+  var results=feeds.map(function(f){
+    var c=cache[f.url];
+    if(c&&c.items&&c.items.length){
+      return{label:f.label,items:c.items,error:c.error||false,stale:c.error||false};
+    }
+    return{label:f.label,items:[],error:false,stale:false};
+  });
+  // Only render if we have at least some cached data
+  var hasData=results.some(function(r){return r.items.length>0;});
+  if(hasData)renderRibbon(results);
+}
+
+// Staggered background refresh — one feed at a time
+var _refreshTimer=null;
+function refreshFeedsStaggered(){
+  if(_refreshTimer)clearTimeout(_refreshTimer);
+  var feeds=getAllFeeds();
+  if(!feeds.length){renderRibbon([]);return;}
+  var idx=0;
+  function next(){
+    if(idx>=feeds.length){
+      // All done — re-render from fresh cache
+      renderFromCache();
+      return;
+    }
+    var feed=feeds[idx];idx++;
+    fetchAndCacheFeed(feed).then(function(){
+      // Re-render after each successful feed so results trickle in
+      renderFromCache();
+      _refreshTimer=setTimeout(next,RSS_FETCH_DELAY);
+    });
+  }
+  next();
+}
+
+// Initial load: render cache immediately, then stagger refresh
+function initRSS(){
+  renderFromCache();
+  // Small delay before starting background refresh to let page settle
+  setTimeout(refreshFeedsStaggered,1500);
+}
+
+// Fetch a single new feed immediately (for when user adds one in settings)
+function fetchSingleFeedNow(feed){
+  return fetchAndCacheFeed(feed).then(function(){renderFromCache();});
+}
+
+initRSS();
+// Refresh every 15 min (staggered, not parallel)
+setInterval(refreshFeedsStaggered,15*60*1000);
 
 })();
 </script>
