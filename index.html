@@ -519,7 +519,7 @@ body{
       <div class="ptitle">Network Info <span id="net-chevron" style="font-size:9px;opacity:.5;">&#x25BC;</span></div>
       <button class="rbtn" id="net-refresh">&#x21BB; Refresh</button>
     </div>
-    <div class="collapsible-body collapsed" id="net-body">
+    <div class="collapsible-body" id="net-body">
       <div class="pb" id="network-body"><div class="nloading">FETCHING&hellip;</div></div>
     </div>
   </div>
@@ -690,11 +690,49 @@ function renderFeedList(){
     return;
   }
   list.innerHTML=userFeeds.map(function(f,i){
-    return '<div class="feed-row"><span class="feed-label">'+f.label+'</span><span class="feed-url">'+f.url+'</span><span class="feed-del" data-fi="'+i+'">&times;</span></div>';
+    return '<div class="feed-row" id="feed-row-'+i+'">'
+      +'<span class="feed-status-dot" id="feed-dot-'+i+'" style="width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0;" title="Not tested"></span>'
+      +'<span class="feed-label">'+f.label+'</span>'
+      +'<span class="feed-url">'+f.url+'</span>'
+      +'<span class="feed-test" data-fi="'+i+'" style="font-size:9px;color:var(--accent);cursor:pointer;flex-shrink:0;padding:0 4px;font-family:var(--font-mono);font-weight:600;" title="Test feed">TEST</span>'
+      +'<span class="feed-del" data-fi="'+i+'">&times;</span>'
+      +'</div>';
   }).join('');
   list.querySelectorAll('.feed-del').forEach(function(el){
     el.addEventListener('click',function(){
       var uf=getUserFeeds();uf.splice(parseInt(el.dataset.fi),1);saveUserFeeds(uf);renderFeedList();loadHeadlineRibbon();
+    });
+  });
+  // Test buttons — check individual feed and show green/red dot
+  list.querySelectorAll('.feed-test').forEach(function(el){
+    el.addEventListener('click',function(){
+      var idx=parseInt(el.dataset.fi);
+      var feed=getUserFeeds()[idx];
+      if(!feed)return;
+      var dot=document.getElementById('feed-dot-'+idx);
+      dot.style.background='var(--yellow)';dot.title='Testing...';
+      el.textContent='...';
+      fetchRSS(feed.url,2).then(function(items){
+        dot.style.background='var(--green)';dot.style.boxShadow='0 0 4px var(--green)';
+        dot.title='Working — '+items.length+' items';
+        el.textContent='\u2713';el.style.color='var(--green)';
+      }).catch(function(){
+        dot.style.background='var(--red-alert)';dot.style.boxShadow='0 0 4px var(--red-alert)';
+        dot.title='Failed — check URL';
+        el.textContent='\u2715';el.style.color='var(--red-alert)';
+      });
+    });
+  });
+  // Auto-test all feeds on render
+  userFeeds.forEach(function(f,i){
+    var dot=document.getElementById('feed-dot-'+i);
+    var testEl=list.querySelector('.feed-test[data-fi="'+i+'"]');
+    fetchRSS(f.url,1).then(function(){
+      if(dot){dot.style.background='var(--green)';dot.style.boxShadow='0 0 4px var(--green)';dot.title='Working';}
+      if(testEl){testEl.textContent='\u2713';testEl.style.color='var(--green)';}
+    }).catch(function(){
+      if(dot){dot.style.background='var(--red-alert)';dot.style.boxShadow='0 0 4px var(--red-alert)';dot.title='Failed';}
+      if(testEl){testEl.textContent='\u2715';testEl.style.color='var(--red-alert)';}
     });
   });
 }
@@ -833,7 +871,7 @@ function loadNetwork(){
   }).catch(function(){el.innerHTML='<div class="nloading">UNAVAILABLE</div>';});
 }
 document.getElementById('net-refresh').addEventListener('click',function(){loadNetwork();});
-if(!netCollapsed)loadNetwork();
+loadNetwork();
 
 // ══════════════════════════════════
 // SERVICE STATUS — DIRECT CORS FETCH
@@ -1018,17 +1056,28 @@ function cleanTitle(t){return t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').repla
 
 function loadHeadlineRibbon(){
   var track=document.getElementById('hr-track');
-  var feeds=getAllFeeds();var all=[];var fails=0;
+  var feeds=getAllFeeds();var all=[];var failedFeeds=[];
   if(!feeds.length){track.innerHTML='<span class="hr-item">Add RSS feeds in Settings to see headlines here</span>';return;}
   var promises=feeds.map(function(feed){
     return fetchRSS(feed.url,5).then(function(items){
-      items.forEach(function(i){all.push({title:cleanTitle(i.title),link:i.link,tag:feed.label});});
-    }).catch(function(){fails++;});
+      items.forEach(function(i){all.push({title:cleanTitle(i.title),link:i.link,tag:feed.label,isError:false});});
+    }).catch(function(){
+      failedFeeds.push(feed.label);
+    });
   });
   Promise.all(promises).then(function(){
-    if(!all.length){all=[{title:fails?'RSS feeds failed':'No stories found',link:'#',tag:fails?'ERROR':'INFO'}];}
+    // Add error indicators for failed feeds so they show inline
+    failedFeeds.forEach(function(label){
+      all.push({title:'\u26A0 Feed failed to load',link:'#',tag:label,isError:true});
+    });
+    if(!all.length){all=[{title:'No feeds configured',link:'#',tag:'INFO',isError:true}];}
     var doubled=all.concat(all);
     track.innerHTML=doubled.map(function(i){
+      if(i.isError){
+        return '<span class="hr-item" style="color:var(--yellow);opacity:.7;cursor:default;">'
+          +'<span class="hr-badge" style="background:rgba(243,156,18,.12);color:var(--yellow);border-color:rgba(243,156,18,.3);">'+i.tag+'</span>'
+          +i.title+'</span>';
+      }
       return '<a class="hr-item" href="'+i.link+'" target="_blank"><span class="hr-badge">'+i.tag+'</span>'+i.title+'</a>';
     }).join('');
     track.style.animationDuration=Math.max(50,doubled.length*4)+'s';
