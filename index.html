@@ -1090,10 +1090,30 @@ document.getElementById('svc-refresh').addEventListener('click',loadStatus);
   }
 
   // Init volume
-  audio.volume=startMuted?0:0.5;
+  var savedVol=parseFloat(localStorage.getItem('jsu_radio_vol'))||0.5;
+  audio.volume=startMuted?0:savedVol;
   audio.muted=startMuted;
-  volSlider.value=startMuted?0:50;
+  volSlider.value=startMuted?0:Math.round(savedVol*100);
   updateMuteUI();
+
+  // Autoplay if start muted is off and bar is visible
+  if(!startMuted&&barVisible){
+    audio.src=STREAM_URL;
+    audio.load();
+    var autoP=audio.play();
+    if(autoP&&autoP.catch)autoP.catch(function(){
+      // Browser blocked autoplay — wait for user interaction then retry
+      var resumeOnce=function(){
+        audio.play().catch(function(){});
+        document.removeEventListener('click',resumeOnce);
+        document.removeEventListener('keydown',resumeOnce);
+      };
+      document.addEventListener('click',resumeOnce);
+      document.addEventListener('keydown',resumeOnce);
+    });
+    isPlaying=true;
+    updatePlayUI();
+  }
 
   playBtn.addEventListener('click',function(){
     if(isPlaying){
