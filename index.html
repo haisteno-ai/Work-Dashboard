@@ -302,6 +302,72 @@ body{
    NEWS
 ═══════════════════════════════════════ */
 /* News list kept for potential future use */
+
+/* MEAL TOGGLE TABS */
+.meal-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.meal-tab{font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.5px;padding:4px 8px;border-radius:calc(var(--radius)*.35);border:1px solid var(--border);background:var(--input-bg);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.meal-tab:hover{border-color:var(--accent);color:var(--accent);}
+.meal-tab.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.meal-tab.now::after{content:' \2022';color:var(--green);}
+.meal-tab.active.now::after{color:var(--bg);}
+.meal-tab.closed-now::after{content:' \2022';color:var(--red-alert);}
+.meal-tab.active.closed-now::after{color:var(--bg);}
+.meal-tab.active.closed-now{background:var(--red-alert);border-color:var(--red-alert);}
+
+/* EVENTS SOURCE FILTER */
+.events-source-filter{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
+.esf-btn{font-family:var(--font-mono);font-size:8px;font-weight:600;letter-spacing:.5px;padding:3px 7px;border-radius:calc(var(--radius)*.3);border:1px solid var(--border);background:var(--input-bg);color:var(--muted);cursor:pointer;transition:all .15s;}
+.esf-btn:hover{border-color:var(--accent);color:var(--accent);}
+.esf-btn.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);}
+.events-updated{font-family:var(--font-mono);font-size:9px;color:var(--muted);opacity:.5;margin-top:9px;font-weight:500;}
+#events-body{max-height:340px;overflow-y:auto;}
+#scores-body{max-height:400px;overflow-y:auto;}
+
+/* SCOREBOARD */
+.live-banner{display:none;padding:10px 12px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:calc(var(--radius)*.5);margin-bottom:10px;animation:livepulse 2.5s infinite;}
+.live-banner.active{display:flex;align-items:center;gap:10px;}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.85}}
+.live-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);animation:blink 1.2s infinite;flex-shrink:0;}
+.live-label{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:2px;color:var(--accent);flex-shrink:0;}
+.live-info{flex:1;min-width:0;}
+.live-matchup{font-family:var(--font-body);font-size:13px;font-weight:600;color:var(--text);}
+.live-score{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent);}
+.live-link{font-family:var(--font-mono);font-size:9px;color:var(--accent);text-decoration:none;font-weight:500;}
+.live-link:hover{text-decoration:underline;}
+
+.sport-filter-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.sport-tab{font-family:var(--font-mono);font-size:8px;font-weight:600;letter-spacing:.5px;padding:3px 7px;border-radius:calc(var(--radius)*.3);border:1px solid var(--border);background:var(--input-bg);color:var(--muted);cursor:pointer;transition:all .15s;}
+.sport-tab:hover{border-color:var(--accent);color:var(--accent);}
+.sport-tab.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);}
+.sport-tab.today-btn.active{background:var(--green);color:var(--bg);border-color:var(--green);}
+
+.scores-section{margin-bottom:12px;}
+.scores-section:last-child{margin-bottom:0;}
+.scores-section-title{font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.game-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:calc(var(--radius)*.35);margin-bottom:2px;transition:background .15s;cursor:pointer;}
+.game-row:hover{background:var(--input-bg);}
+.game-sport{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--accent);min-width:40px;flex-shrink:0;letter-spacing:.5px;}
+.game-details{flex:1;min-width:0;}
+.game-matchup{font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.game-meta{font-family:var(--font-mono);font-size:9px;color:var(--muted);font-weight:500;margin-top:1px;}
+.game-result{font-family:var(--font-mono);font-size:12px;font-weight:700;flex-shrink:0;padding:2px 6px;border-radius:calc(var(--radius)*.25);}
+.game-result.win{color:var(--green);background:rgba(34,197,94,.08);}
+.game-result.loss{color:var(--red-alert);background:rgba(239,68,68,.08);}
+.game-time{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;min-width:55px;text-align:right;}
+
+/* EVENTS CARD */
+.events-day-group{margin-bottom:12px;}
+.events-day-group:last-child{margin-bottom:0;}
+.events-day-label{font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.event-row{display:flex;gap:10px;padding:6px 8px;border-radius:calc(var(--radius)*.35);transition:all .15s;margin-bottom:2px;}
+.event-row:hover{background:var(--input-bg);}
+.event-time{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);min-width:65px;flex-shrink:0;}
+.event-details{flex:1;min-width:0;}
+.event-title{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.event-loc{font-family:var(--font-mono);font-size:9px;color:var(--muted);font-weight:500;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.event-src-tag{display:inline-block;font-family:var(--font-mono);font-size:7px;padding:1px 5px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--border);letter-spacing:.5px;font-weight:600;margin-left:6px;vertical-align:middle;}
+.events-empty{font-family:var(--font-mono);font-size:11px;color:var(--muted);opacity:.5;padding:18px;text-align:center;font-weight:500;}
+.events-footer{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
 .news-list{display:flex;flex-direction:column;}
 .ni{padding:8px 10px;border-left:2px solid transparent;transition:all .15s;border-radius:calc(var(--radius)*.3);margin-bottom:1px;}
 .ni:hover{background:var(--surface2);border-left-color:var(--accent);}
@@ -524,7 +590,7 @@ body.radio-active .footer{padding-bottom:48px;}
     </div>
   </div>
 
-  <!-- 2. SERVICE STATUS + DINING -->
+  <!-- 2. SERVICE STATUS + CAMPUS EVENTS -->
   <div class="dual-row">
     <div class="panel" id="card-service-status" style="animation-delay:.1s">
       <div class="ph"><div class="pdot"></div><div class="ptitle">Service Status</div><button class="rbtn" id="svc-refresh">&#x21BB; Refresh</button></div>
@@ -533,22 +599,48 @@ body.radio-active .footer{padding-bottom:48px;}
         <div class="svc-updated" id="svc-updated"></div>
       </div>
     </div>
-    <div class="panel" id="card-dining" style="animation-delay:.15s">
+    <div class="panel" id="card-events" style="animation-delay:.15s">
+      <div class="ph"><div class="pdot"></div><div class="ptitle">Campus Events</div><button class="rbtn" id="events-refresh">&#x21BB; Refresh</button></div>
+      <div class="pb">
+        <div class="events-source-filter" id="events-filter"></div>
+        <div id="events-body"><div class="nloading">LOADING EVENTS&hellip;</div></div>
+        <div class="events-updated" id="events-updated"></div>
+        <div class="events-footer">
+          <a href="https://jsu.campusgroups.com/events" target="_blank" class="news-link">&#x1F4C5; CampusGroups</a>
+          <a href="https://www.jsu.edu/calendars/" target="_blank" class="news-link">&#x1F4C6; Trumba Calendar</a>
+          <a href="https://www.jsu.edu/registrar/academic-calendar/index.html" target="_blank" class="news-link">&#x1F393; Academic Calendar</a>
+          <a href="https://jsu.libcal.com" target="_blank" class="news-link">&#x1F4DA; Library Events</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. GAMEDAY SCOREBOARD + DINING HALL -->
+  <div class="dual-row">
+    <div class="panel" id="card-scoreboard" style="animation-delay:.2s">
+      <div class="ph"><div class="pdot"></div><div class="ptitle">Gameday Scoreboard</div><button class="rbtn" id="scores-refresh">&#x21BB; Refresh</button></div>
+      <div class="pb">
+        <div class="live-banner" id="live-banner"></div>
+        <div class="sport-filter-tabs" id="sport-tabs"></div>
+        <div id="scores-body"><div class="nloading">LOADING SCOREBOARD&hellip;</div></div>
+        <div class="svc-updated" id="scores-updated"></div>
+      </div>
+    </div>
+    <div class="panel" id="card-dining" style="animation-delay:.25s">
       <div class="ph"><div class="pdot"></div><div class="ptitle"><a href="https://jsudining.sodexomyway.com/en-us/locations/dining-hall" target="_blank">JAX State Dining Hall &#x2197;</a></div></div>
       <div class="pb">
         <div class="cafe-period-indicator" id="cafe-period-indicator">
           <div class="cafe-period-dot"></div>
           <span class="cafe-period-text" id="cafe-period-text">---</span>
         </div>
+        <div class="meal-tabs" id="meal-tabs"></div>
         <div id="cafe-row"><div class="nloading">LOADING MENUS&hellip;</div></div>
       </div>
     </div>
   </div>
 
-  <!-- News card removed -->
-
   <!-- 4. NETWORK INFO (COLLAPSIBLE) -->
-  <div class="panel" id="card-network" style="animation-delay:.25s">
+  <div class="panel" id="card-network" style="animation-delay:.3s">
     <div class="ph collapsible-toggle" id="net-toggle">
       <div class="pdot"></div>
       <div class="ptitle">Network Info <span id="net-chevron" style="font-size:9px;opacity:.5;">&#x25BC;</span></div>
@@ -631,6 +723,13 @@ body.radio-active .footer{padding-bottom:48px;}
         <button class="add-feed-go" id="add-feed-btn">ADD</button>
       </div>
     </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Display</div>
+      <div class="modal-row">
+        <span class="modal-row-label">24-Hour Clock</span>
+        <label class="ios-toggle"><input type="checkbox" id="setting-24h" checked/><div class="ios-track"></div><div class="ios-thumb"></div></label>
+      </div>
+    </div>
     <button class="modal-close-btn" id="settings-close">DONE</button>
   </div>
 </div>
@@ -689,6 +788,8 @@ document.getElementById('theme-overlay').addEventListener('click',function(e){if
 var CARDS=[
   {id:'card-quick-access',label:'Quick Access'},
   {id:'card-service-status',label:'Service Status'},
+  {id:'card-events',label:'Campus Events'},
+  {id:'card-scoreboard',label:'Gameday Scoreboard'},
   {id:'card-dining',label:'Dining Hall'},
   {id:'card-network',label:'Network Info'}
 ];
@@ -700,14 +801,15 @@ function applyVis(){
     var el=document.getElementById(c.id);
     if(el)el.style.display=v[c.id]===false?'none':'';
   });
-  // Handle dual-row parent visibility
-  var dr=document.querySelector('.dual-row');
-  if(dr){
-    var svcVis=v['card-service-status']!==false;
-    var dinVis=v['card-dining']!==false;
-    if(!svcVis&&!dinVis)dr.style.display='none';
-    else{dr.style.display='';dr.style.gridTemplateColumns=svcVis&&dinVis?'55fr 45fr':'1fr';}
-  }
+  // Handle dual-row parent visibility for both rows
+  var dualRows=document.querySelectorAll('.dual-row');
+  dualRows.forEach(function(dr){
+    var children=dr.querySelectorAll('.panel');
+    var visCount=0;
+    children.forEach(function(ch){if(ch.style.display!=='none')visCount++;});
+    if(visCount===0)dr.style.display='none';
+    else{dr.style.display='';dr.style.gridTemplateColumns=visCount>1?'55fr 45fr':'1fr';}
+  });
 }
 function renderSettingsCards(){
   var list=document.getElementById('settings-cards-list');
@@ -832,14 +934,23 @@ document.getElementById('add-feed-btn').addEventListener('click',function(){
 });
 
 // ══════════════════════════════════
-// CLOCK
+// CLOCK + TIME FORMAT
 // ══════════════════════════════════
+var use24h=localStorage.getItem('jsu_24h')!=='false';
 function tick(){
   var n=new Date();
-  document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour12:false});
+  document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour12:!use24h});
   document.getElementById('date').textContent=n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
 }
 tick();setInterval(tick,1000);
+
+// 24h toggle in settings
+document.getElementById('setting-24h').checked=use24h;
+document.getElementById('setting-24h').addEventListener('change',function(){
+  use24h=this.checked;
+  localStorage.setItem('jsu_24h',use24h?'true':'false');
+  tick();
+});
 
 // ══════════════════════════════════
 // QUICK ACCESS — collapsible columns
@@ -1195,7 +1306,7 @@ document.getElementById('svc-refresh').addEventListener('click',loadStatus);
 })();
 
 // ══════════════════════════════════
-// DINING HALL
+// DINING HALL — with meal toggle
 // ══════════════════════════════════
 (function(){
   var MEALS=[
@@ -1212,26 +1323,568 @@ document.getElementById('svc-refresh').addEventListener('click',loadStatus);
     'Dinner':[{station:'Entree',items:['Roast Beef','Chicken Alfredo','Vegetable Stir-Fry']},{station:'Sides',items:['Rice Pilaf','Steamed Broccoli','Dinner Roll','Baked Potato']},{station:'Dessert',items:['Cake Slice','Pudding','Fresh Fruit']}],
     'Late Night':[{station:'Late Bites',items:['Pizza Slices','Chicken Wings','Mozzarella Sticks']},{station:'Beverages',items:['Fountain Drinks','Coffee','Hot Chocolate']}]
   };
+  var selectedMeal=null; // null = auto (current period)
+
   function getCurrent(){
     var now=new Date(),m=now.getHours()*60+now.getMinutes();
-    for(var i=0;i<MEALS.length;i++){var p=MEALS[i];if(m>=p.sH*60+p.sM&&m<=p.eH*60+p.eM)return{cur:p,next:(i+1)%MEALS.length};}
-    return{cur:null,next:0};
+    for(var i=0;i<MEALS.length;i++){var p=MEALS[i];if(m>=p.sH*60+p.sM&&m<=p.eH*60+p.eM)return{cur:p,curIdx:i,next:(i+1)%MEALS.length};}
+    return{cur:null,curIdx:-1,next:0};
   }
   function fmt(h,m){var ap=h>=12?'PM':'AM';var h2=h%12;if(!h2)h2=12;return h2+':'+(m<10?'0':'')+m+' '+ap;}
-  function getMeal(){var mp=getCurrent();return mp.cur?mp.cur.name:MEALS[mp.next].name;}
-  function update(){
+  function getActiveMeal(){
+    if(selectedMeal)return selectedMeal;
+    var mp=getCurrent();return mp.cur?mp.cur.name:MEALS[mp.next].name;
+  }
+
+  function renderTabs(){
+    var mp=getCurrent();
+    var active=getActiveMeal();
+    var isClosed=sodexoChecked&&!sodexoHasData;
+    var tabsEl=document.getElementById('meal-tabs');
+    tabsEl.innerHTML=MEALS.map(function(p){
+      var isCurrent=mp.cur&&mp.cur.name===p.name;
+      var isActive=active===p.name;
+      var cls='meal-tab'+(isActive?' active':'')+(isCurrent?(isClosed?' closed-now':' now'):'');
+      return '<button class="'+cls+'" data-meal="'+p.name+'"'+(isClosed?' disabled style="opacity:.5;cursor:default;"':'')+'>'+p.emoji+' '+p.name+'</button>';
+    }).join('');
+    if(!isClosed){
+      tabsEl.querySelectorAll('.meal-tab').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          var meal=btn.dataset.meal;
+          var mp2=getCurrent();
+          var autoMeal=mp2.cur?mp2.cur.name:MEALS[mp2.next].name;
+          if(meal===autoMeal)selectedMeal=null;
+          else selectedMeal=meal;
+          render();
+        });
+      });
+    }
+  }
+
+  function updateIndicator(){
     var mp=getCurrent();
     var dot=document.querySelector('#cafe-period-indicator .cafe-period-dot');
     var txt=document.getElementById('cafe-period-text');
-    if(mp.cur){dot.style.background='var(--green)';dot.style.boxShadow='0 0 5px var(--green)';txt.textContent='NOW SERVING: '+mp.cur.emoji+' '+mp.cur.name.toUpperCase()+' (until '+fmt(mp.cur.eH,mp.cur.eM)+')';txt.style.color='var(--green)';}
-    else{var nx=MEALS[mp.next];dot.style.background='var(--yellow)';dot.style.boxShadow='0 0 5px var(--yellow)';txt.textContent='BETWEEN MEALS \u2014 NEXT: '+nx.emoji+' '+nx.name.toUpperCase()+' at '+fmt(nx.sH,nx.sM);txt.style.color='var(--yellow)';}
-    var meal=getMeal(),data=MENU[meal]||[];
-    var h='';for(var s=0;s<data.length;s++){var st=data[s];h+='<div class="cafe-station"><div class="cafe-station-name">'+st.station+'</div><div class="cafe-items">'+st.items.map(function(i){return '<span class="cafe-item">'+i+'</span>';}).join('')+'</div></div>';}
+    // If Sodexo confirmed closed, show red closed indicator
+    if(sodexoChecked&&!sodexoHasData&&!selectedMeal){
+      dot.style.background='var(--red-alert)';dot.style.boxShadow='0 0 5px var(--red-alert)';dot.style.animation='none';
+      txt.textContent='DINING HALL CLOSED';
+      txt.style.color='var(--red-alert)';
+      return;
+    }
+    if(mp.cur){
+      dot.style.background='var(--green)';dot.style.boxShadow='0 0 5px var(--green)';dot.style.animation='';
+      txt.textContent='NOW SERVING: '+mp.cur.emoji+' '+mp.cur.name.toUpperCase()+' (until '+fmt(mp.cur.eH,mp.cur.eM)+')';
+      txt.style.color='var(--green)';
+    }else{
+      var nx=MEALS[mp.next];
+      dot.style.background='var(--yellow)';dot.style.boxShadow='0 0 5px var(--yellow)';dot.style.animation='';
+      txt.textContent='BETWEEN MEALS \u2014 NEXT: '+nx.emoji+' '+nx.name.toUpperCase()+' at '+fmt(nx.sH,nx.sM);
+      txt.style.color='var(--yellow)';
+    }
+    // If viewing a different period, show a note
+    if(selectedMeal){
+      var mp2=getCurrent();
+      var autoMeal=mp2.cur?mp2.cur.name:MEALS[mp2.next].name;
+      if(selectedMeal!==autoMeal){
+        txt.textContent+=(' \u2014 Viewing: '+selectedMeal);
+      }
+    }
+  }
+
+  function renderMenu(){
+    // If Sodexo confirmed no data, always show closed regardless of selected tab
+    if(sodexoChecked&&!sodexoHasData){
+      showDiningClosed('No menu published for today. The dining hall may be closed or between semesters.');
+      return;
+    }
+    var meal=getActiveMeal();
+    var data=MENU[meal]||[];
+    var h='';
+    for(var s=0;s<data.length;s++){
+      var st=data[s];
+      h+='<div class="cafe-station"><div class="cafe-station-name">'+st.station+'</div><div class="cafe-items">'+st.items.map(function(i){return '<span class="cafe-item">'+i+'</span>';}).join('')+'</div></div>';
+    }
     if(!data.length)h='<div class="nloading">No menu data</div>';
     document.getElementById('cafe-row').innerHTML=h;
   }
-  update();var last=getMeal();
-  setInterval(function(){update();var n=getMeal();if(last!==n){last=n;update();}},60000);
+
+  function render(){
+    updateIndicator();
+    renderTabs();
+    renderMenu();
+  }
+
+  render();
+
+  // Sodexo Live API — fetch real menu, show closed if empty
+  var SODEXO_API='https://api-prd.sodexomyway.net/v0.2/data/menu/54263001/15321';
+  var SODEXO_KEY='68717828-b754-420d-9488-4c37cb7d7ef7';
+  var sodexoHasData=false;
+  var sodexoChecked=false;
+
+  function showDiningClosed(reason){
+    document.getElementById('cafe-row').innerHTML='<div class="nloading" style="text-align:left;padding:20px 14px;">'
+      +'<div style="font-size:16px;margin-bottom:6px;">&#x1F6AB; Dining Hall Closed</div>'
+      +'<div style="font-size:11px;opacity:.6;">'+reason+'</div>'
+      +'<div style="font-size:10px;opacity:.4;margin-top:8px;"><a href="https://jsudining.sodexomyway.com/en-us/locations/dining-hall" target="_blank" style="color:var(--accent);text-decoration:none;">Check Sodexo site for hours &rarr;</a></div>'
+      +'</div>';
+    updateIndicator();
+  }
+
+  function fetchSodexoMenu(){
+    var today=new Date();
+    var dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    fetch(SODEXO_API+'?date='+dateStr,{
+      headers:{'API-Key':SODEXO_KEY,'Content-Type':'application/json'}
+    })
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(data){
+      if(!data||!Array.isArray(data)||!data.length){
+        sodexoChecked=true;
+        showDiningClosed('No menu published for today. The dining hall may be closed or between semesters.');
+        return;
+      }
+      sodexoChecked=true;
+      sodexoHasData=true;
+      // TODO: Parse Sodexo JSON into menu format once we have a real response sample (test May 7+)
+      console.log('Sodexo menu data received:',data);
+    })
+    .catch(function(){
+      sodexoChecked=true;
+      showDiningClosed('Could not reach Sodexo menu service. Check back later.');
+    });
+  }
+  fetchSodexoMenu();
+
+  var lastAutoMeal=getActiveMeal();
+  setInterval(function(){
+    var newAuto=getCurrent();
+    var newMeal=newAuto.cur?newAuto.cur.name:MEALS[newAuto.next].name;
+    if(lastAutoMeal!==newMeal){lastAutoMeal=newMeal;if(!selectedMeal)render();else{updateIndicator();renderTabs();}}
+  },60000);
+})();
+
+// ══════════════════════════════════
+// CAMPUS EVENTS — iCal + RSS feeds with dedup and source filtering
+// ══════════════════════════════════
+(function(){
+  var EVENT_FEEDS=[
+    {url:'https://jsu.campusgroups.com/ical/jsu/ical_jsu.ics',label:'CampusGroups',type:'ical'},
+    {url:'https://www.trumba.com/calendars/jsu-events.ics',label:'JSU Events',type:'ical'}
+  ];
+  var EVENTS_CACHE_KEY='jsu_events_cache';
+  var EVENTS_CACHE_MAX=60*60*1000;
+  var activeSourceFilter='all';
+
+  function getEventsCache(){try{return JSON.parse(localStorage.getItem(EVENTS_CACHE_KEY))||{};}catch(e){return{};}}
+  function saveEventsCache(c){try{localStorage.setItem(EVENTS_CACHE_KEY,JSON.stringify(c));}catch(e){}}
+
+  function parseICal(text){
+    var events=[];
+    text=text.replace(/\r\n[ \t]/g,'').replace(/\r/g,'');
+    var blocks=text.split('BEGIN:VEVENT');
+    for(var i=1;i<blocks.length;i++){
+      var block=blocks[i].split('END:VEVENT')[0];
+      var ev={};
+      var lines=block.split('\n');
+      for(var j=0;j<lines.length;j++){
+        var line=lines[j].trim();
+        if(!line)continue;
+        var colonIdx=line.indexOf(':');
+        if(colonIdx<0)continue;
+        var key=line.substring(0,colonIdx);
+        var val=line.substring(colonIdx+1);
+        var semiIdx=key.indexOf(';');
+        if(semiIdx>0)key=key.substring(0,semiIdx);
+        if(key==='SUMMARY')ev.title=val.replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\n/g,' ').trim();
+        else if(key==='DTSTART')ev.start=parseICalDate(val);
+        else if(key==='DTEND')ev.end=parseICalDate(val);
+        else if(key==='LOCATION')ev.location=val.replace(/\\,/g,',').replace(/\\n/g,', ').trim();
+        else if(key==='DESCRIPTION')ev.desc=val.replace(/\\n/g,' ').substring(0,200).trim();
+        else if(key==='URL')ev.url=val.trim();
+      }
+      if(ev.title&&ev.start)events.push(ev);
+    }
+    return events;
+  }
+
+  function parseICalDate(s){
+    s=s.trim();
+    if(s.length>=15){
+      var y=parseInt(s.substr(0,4)),mo=parseInt(s.substr(4,2))-1,d=parseInt(s.substr(6,2));
+      var h=parseInt(s.substr(9,2)),mi=parseInt(s.substr(11,2)),sec=parseInt(s.substr(13,2))||0;
+      if(s.endsWith('Z'))return new Date(Date.UTC(y,mo,d,h,mi,sec));
+      return new Date(y,mo,d,h,mi,sec);
+    }
+    if(s.length>=8){
+      return new Date(parseInt(s.substr(0,4)),parseInt(s.substr(4,2))-1,parseInt(s.substr(6,2)));
+    }
+    return new Date(s);
+  }
+
+  function fetchEventFeed(feed){
+    var url=feed.url;
+    var parseResult=function(text){
+      if(feed.type==='ical'){
+        if(text.indexOf('BEGIN:VCALENDAR')<0)throw new Error('Not iCal');
+        var events=parseICal(text);
+        return events.map(function(e){e.source=feed.label;return e;});
+      }
+      return parseRSSEvents(text,feed.label);
+    };
+    // Strategy 1: codetabs (most reliable for large iCal files)
+    return fetchWithTimeout('https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),{cache:'no-cache'},12000)
+      .then(function(r){if(!r.ok)throw new Error('codetabs');return r.text();})
+      .then(function(text){return parseResult(text);})
+      .catch(function(){
+        // Strategy 2: allorigins /get
+        return fetchWithTimeout('https://api.allorigins.win/get?url='+encodeURIComponent(url),{cache:'no-cache'},10000)
+          .then(function(r){if(!r.ok)throw new Error('ao-get');return r.json();})
+          .then(function(j){if(!j.contents)throw new Error('empty');return parseResult(j.contents);});
+      })
+      .catch(function(){
+        // Strategy 3: allorigins /raw
+        return fetchWithTimeout('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-cache'},10000)
+          .then(function(r){if(!r.ok)throw new Error('ao-raw');return r.text();})
+          .then(function(text){return parseResult(text);});
+      })
+      .catch(function(){
+        // Strategy 4: corsproxy
+        return fetchWithTimeout('https://corsproxy.io/?'+encodeURIComponent(url),{cache:'no-cache'},8000)
+          .then(function(r){if(!r.ok)throw new Error('cors');return r.text();})
+          .then(function(text){return parseResult(text);});
+      });
+  }
+
+  function parseRSSEvents(xml,label){
+    var events=[];
+    try{
+      var doc=new DOMParser().parseFromString(xml,'text/xml');
+      if(doc.querySelector('parsererror'))return events;
+      var items=doc.querySelectorAll('item');
+      items.forEach(function(item){
+        var title=(item.querySelector('title')||{}).textContent||'';
+        var desc=(item.querySelector('description')||{}).textContent||'';
+        var link='';
+        var les=item.getElementsByTagName('link');
+        for(var i=0;i<les.length;i++){var hr=les[i].getAttribute('href');var tx=(les[i].textContent||'').trim();if(hr){link=hr;break;}if(tx&&tx.indexOf('http')===0){link=tx;break;}}
+        var pubDate=(item.querySelector('pubDate')||item.querySelector('published')||{}).textContent||'';
+        if(title&&pubDate){
+          events.push({title:title.trim(),start:new Date(pubDate),location:'',source:label,url:link});
+        }
+      });
+    }catch(e){}
+    return events;
+  }
+
+  // Deduplication — events with same title + same day = duplicate
+  function dedup(events){
+    var seen={};
+    return events.filter(function(e){
+      var key=e.title.toLowerCase().replace(/\s+/g,' ').trim()+'|'+e.start.toDateString();
+      if(seen[key])return false;
+      seen[key]=true;
+      return true;
+    });
+  }
+
+  function isToday(d){var n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate();}
+  function isTomorrow(d){var t=new Date();t.setDate(t.getDate()+1);return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();}
+  function isThisWeek(d){var now=new Date();var endOfWeek=new Date(now);endOfWeek.setDate(now.getDate()+(7-now.getDay()));endOfWeek.setHours(23,59,59);return d<=endOfWeek&&d>=now;}
+  function fmtTime(d){return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}
+  function fmtDayShort(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'});}
+  function timeAgo(ts){var m=Math.round((Date.now()-ts)/60000);if(m<1)return'just now';if(m<60)return m+'m ago';var h=Math.round(m/60);return h+'h ago';}
+
+  function renderSourceFilter(events){
+    var filterEl=document.getElementById('events-filter');
+    var sources={};
+    events.forEach(function(e){sources[e.source]=true;});
+    var srcList=Object.keys(sources).sort();
+    if(srcList.length<2){filterEl.innerHTML='';return;}
+    var html='<button class="esf-btn'+(activeSourceFilter==='all'?' active':'')+'" data-src="all">All</button>';
+    srcList.forEach(function(s){
+      html+='<button class="esf-btn'+(activeSourceFilter===s?' active':'')+'" data-src="'+s+'">'+s+'</button>';
+    });
+    filterEl.innerHTML=html;
+    filterEl.querySelectorAll('.esf-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        activeSourceFilter=btn.dataset.src;
+        var cache=getEventsCache();
+        if(cache.events){
+          var evts=cache.events.map(function(e){e.start=new Date(e.start);if(e.end)e.end=new Date(e.end);return e;});
+          renderEvents(evts);
+        }
+      });
+    });
+  }
+
+  function renderEvents(events){
+    var el=document.getElementById('events-body');
+    if(!events||!events.length){
+      el.innerHTML='<div class="events-empty">No upcoming events found</div>';
+      renderSourceFilter([]);
+      return;
+    }
+    renderSourceFilter(events);
+    // Apply source filter
+    var filtered=activeSourceFilter==='all'?events:events.filter(function(e){return e.source===activeSourceFilter;});
+    // Filter to future events only (within next 14 days)
+    var now=new Date();
+    var cutoff=new Date(now);cutoff.setDate(cutoff.getDate()+14);
+    var upcoming=filtered.filter(function(e){return e.start>=now&&e.start<=cutoff;});
+    upcoming.sort(function(a,b){return a.start-b.start;});
+    upcoming=dedup(upcoming);
+    upcoming=upcoming.slice(0,20);
+    if(!upcoming.length){
+      el.innerHTML='<div class="events-empty">No events in the next 2 weeks'+(activeSourceFilter!=='all'?' for '+activeSourceFilter:'')+'</div>';
+      return;
+    }
+    var groups={today:[],tomorrow:[],week:[],later:[]};
+    upcoming.forEach(function(e){
+      if(isToday(e.start))groups.today.push(e);
+      else if(isTomorrow(e.start))groups.tomorrow.push(e);
+      else if(isThisWeek(e.start))groups.week.push(e);
+      else groups.later.push(e);
+    });
+    var html='';
+    function renderGroup(label,items,showDay){
+      if(!items.length)return '';
+      var h='<div class="events-day-group"><div class="events-day-label">'+label+'</div>';
+      items.forEach(function(e){
+        var timeStr=showDay?fmtDayShort(e.start)+' '+fmtTime(e.start):fmtTime(e.start);
+        var locStr=e.location?'<div class="event-loc">'+e.location+'</div>':'';
+        h+='<div class="event-row"><div class="event-time">'+timeStr+'</div><div class="event-details"><div class="event-title">'+e.title+'<span class="event-src-tag">'+e.source+'</span></div>'+locStr+'</div></div>';
+      });
+      h+='</div>';
+      return h;
+    }
+    html+=renderGroup('Today',groups.today,false);
+    html+=renderGroup('Tomorrow',groups.tomorrow,false);
+    html+=renderGroup('This Week',groups.week,true);
+    html+=renderGroup('Coming Up',groups.later,true);
+    el.innerHTML=html;
+  }
+
+  function loadEvents(){
+    var el=document.getElementById('events-body');
+    var cache=getEventsCache();
+    if(cache.events&&cache.events.length){
+      var evts=cache.events.map(function(e){e.start=new Date(e.start);if(e.end)e.end=new Date(e.end);return e;});
+      renderEvents(evts);
+      if(cache.ts)document.getElementById('events-updated').textContent='Updated '+timeAgo(cache.ts);
+    }
+    if(cache.ts&&(Date.now()-cache.ts)<EVENTS_CACHE_MAX)return;
+    if(!cache.events||!cache.events.length)el.innerHTML='<div class="nloading">LOADING EVENTS&hellip;</div>';
+    var allEvents=[];var idx=0;
+    function nextFeed(){
+      if(idx>=EVENT_FEEDS.length){
+        if(allEvents.length){
+          var toCache=allEvents.map(function(e){return{title:e.title,start:e.start.toISOString(),end:e.end?e.end.toISOString():null,location:e.location||'',source:e.source,url:e.url||''};});
+          saveEventsCache({events:toCache,ts:Date.now()});
+          document.getElementById('events-updated').textContent='Updated just now';
+        }
+        renderEvents(allEvents);
+        return;
+      }
+      var feed=EVENT_FEEDS[idx];idx++;
+      fetchEventFeed(feed).then(function(events){
+        allEvents=allEvents.concat(events);
+        renderEvents(allEvents);
+        setTimeout(nextFeed,3000);
+      }).catch(function(){
+        setTimeout(nextFeed,1000);
+      });
+    }
+    nextFeed();
+  }
+  loadEvents();
+  setInterval(loadEvents,30*60*1000);
+  document.getElementById('events-refresh').addEventListener('click',function(){
+    localStorage.removeItem(EVENTS_CACHE_KEY);
+    activeSourceFilter='all';
+    loadEvents();
+  });
+})();
+
+// ══════════════════════════════════
+// GAMEDAY SCOREBOARD — Sidearm Sports JSON API
+// ══════════════════════════════════
+(function(){
+  var SCORES_CACHE_KEY='jsu_scores_cache';
+  var SCORES_CACHE_MAX=30*60*1000;
+  var selectedSport='all';
+  var todayOnly=false;
+
+  function getScoresCache(){try{return JSON.parse(localStorage.getItem(SCORES_CACHE_KEY))||{};}catch(e){return{};}}
+  function saveScoresCache(c){try{localStorage.setItem(SCORES_CACHE_KEY,JSON.stringify(c));}catch(e){}}
+  function timeAgo(ts){var m=Math.round((Date.now()-ts)/60000);if(m<1)return'just now';if(m<60)return m+'m ago';return Math.round(m/60)+'h ago';}
+
+  function proxyFetch(url){
+    // Strategy 1: codetabs
+    return fetchWithTimeout('https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),{cache:'no-cache'},12000)
+      .then(function(r){if(!r.ok)throw new Error('');return r.json();})
+      .catch(function(){
+        // Strategy 2: allorigins /get
+        return fetchWithTimeout('https://api.allorigins.win/get?url='+encodeURIComponent(url),{cache:'no-cache'},10000)
+          .then(function(r){if(!r.ok)throw new Error('');return r.json();})
+          .then(function(j){if(!j.contents)throw new Error('');return JSON.parse(j.contents);});
+      })
+      .catch(function(){
+        // Strategy 3: allorigins /raw
+        return fetchWithTimeout('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-cache'},10000)
+          .then(function(r){if(!r.ok)throw new Error('');return r.json();});
+      })
+      .catch(function(){
+        // Strategy 4: corsproxy
+        return fetchWithTimeout('https://corsproxy.io/?'+encodeURIComponent(url),{cache:'no-cache'},8000)
+          .then(function(r){if(!r.ok)throw new Error('');return r.json();});
+      });
+  }
+
+  function fetchCalendar(){
+    var now=new Date();
+    var dateStr=(now.getMonth()+1)+'/'+now.getDate()+'/'+now.getFullYear();
+    return proxyFetch('https://jaxstatesports.com/services/responsive-calendar.ashx?type=month&sport=0&date='+encodeURIComponent(dateStr));
+  }
+
+  function fetchLiveStats(){
+    return proxyFetch('https://jaxstatesports.com/services/livestats.ashx');
+  }
+
+  function isToday(d){var n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate();}
+  function fmtGameDate(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+
+  function renderSportTabs(events){
+    var tabsEl=document.getElementById('sport-tabs');
+    var sports={};
+    events.forEach(function(e){if(e.sport)sports[e.sport.short_display||e.sport.abbreviation]=e.sport.shortname;});
+    var sportList=Object.keys(sports).sort();
+    var html='<button class="sport-tab'+(selectedSport==='all'?' active':'')+'" data-sport="all">All</button>';
+    html+='<button class="sport-tab today-btn'+(todayOnly?' active':'')+'" data-today="1">Today Only</button>';
+    sportList.forEach(function(s){
+      html+='<button class="sport-tab'+(selectedSport===s?' active':'')+'" data-sport="'+s+'">'+s+'</button>';
+    });
+    tabsEl.innerHTML=html;
+    tabsEl.querySelectorAll('.sport-tab').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        if(btn.dataset.today){todayOnly=!todayOnly;}
+        else{selectedSport=btn.dataset.sport;}
+        renderScoreboard(getScoresCache().events||[]);
+      });
+    });
+  }
+
+  function renderScoreboard(events){
+    var el=document.getElementById('scores-body');
+    if(!events||!events.length){el.innerHTML='<div class="events-empty">No game data available</div>';renderSportTabs([]);return;}
+    renderSportTabs(events);
+    var now=new Date();
+    // Filter by sport
+    var filtered=selectedSport==='all'?events:events.filter(function(e){return(e.sport.short_display||e.sport.abbreviation)===selectedSport;});
+    if(todayOnly)filtered=filtered.filter(function(e){return isToday(new Date(e.date));});
+    // Split into upcoming and results
+    var upcoming=[],results=[];
+    filtered.forEach(function(e){
+      if(e.result&&e.result.team_score&&e.result.team_score!=='')results.push(e);
+      else if(new Date(e.date)>=new Date(now.getFullYear(),now.getMonth(),now.getDate()))upcoming.push(e);
+    });
+    upcoming.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    results.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    upcoming=upcoming.slice(0,5);
+    results=results.slice(0,5);
+    var html='';
+    if(upcoming.length){
+      html+='<div class="scores-section"><div class="scores-section-title">Upcoming</div>';
+      upcoming.forEach(function(e){
+        var d=new Date(e.date);
+        var abbr=e.sport.short_display||e.sport.abbreviation||'';
+        var opp=e.opponent?e.opponent.title:'TBD';
+        var atVs=e.at_vs==='at'?'at ':'vs ';
+        var loc=e.location||'';
+        var time=e.time||fmtGameDate(d);
+        html+='<div class="game-row" title="'+loc+'">';
+        html+='<div class="game-sport">'+abbr+'</div>';
+        html+='<div class="game-details"><div class="game-matchup">'+atVs+opp+'</div><div class="game-meta">'+fmtGameDate(d)+(e.time?' \u2022 '+e.time:'')+(loc?' \u2022 '+loc:'')+'</div></div>';
+        html+='<div class="game-time">'+(e.time||'TBD')+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+    if(results.length){
+      html+='<div class="scores-section"><div class="scores-section-title">Recent Results</div>';
+      results.forEach(function(e){
+        var abbr=e.sport.short_display||e.sport.abbreviation||'';
+        var opp=e.opponent?e.opponent.title:'';
+        var atVs=e.at_vs==='at'?'at ':'vs ';
+        var isWin=e.result.status==='W';
+        var score=e.result.team_score+'-'+e.result.opponent_score;
+        var boxUrl=e.result.boxscore?e.result.boxscore.url:'';
+        html+='<div class="game-row"'+(boxUrl?' onclick="window.open(\'https://jaxstatesports.com'+boxUrl+'\',\'_blank\')"':'')+' title="Click for box score">';
+        html+='<div class="game-sport">'+abbr+'</div>';
+        html+='<div class="game-details"><div class="game-matchup">'+atVs+opp+'</div><div class="game-meta">'+fmtGameDate(new Date(e.date))+(e.result.postscore_info?' \u2022 '+e.result.postscore_info:'')+'</div></div>';
+        html+='<div class="game-result '+(isWin?'win':'loss')+'">'+e.result.status+' '+score+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+    if(!html)html='<div class="events-empty">No games found'+(todayOnly?' today':'')+(selectedSport!=='all'?' for '+selectedSport:'')+'</div>';
+    el.innerHTML=html;
+  }
+
+  function renderLiveBanner(liveData){
+    var banner=document.getElementById('live-banner');
+    if(!liveData||!liveData.Games||!liveData.Games.length){
+      banner.classList.remove('active');
+      return;
+    }
+    var game=liveData.Games[0];
+    banner.classList.add('active');
+    banner.innerHTML='<div class="live-dot"></div><div class="live-label">LIVE</div><div class="live-info">'
+      +'<div class="live-matchup">'+(game.Sport||'')+ ' \u2022 '+(game.Opponent||'Game in Progress')+'</div>'
+      +'<div class="live-score">'+(game.HomeScore||'0')+' - '+(game.AwayScore||'0')+'</div>'
+      +'</div>'+(game.Url?'<a class="live-link" href="'+game.Url+'" target="_blank">STATS \u2197</a>':'');
+  }
+
+  function loadScoreboard(){
+    var cache=getScoresCache();
+    if(cache.events&&cache.events.length){
+      renderScoreboard(cache.events);
+      if(cache.ts)document.getElementById('scores-updated').textContent='Updated '+timeAgo(cache.ts);
+    }
+    if(cache.ts&&(Date.now()-cache.ts)<SCORES_CACHE_MAX)return;
+    if(!cache.events||!cache.events.length)document.getElementById('scores-body').innerHTML='<div class="nloading">LOADING SCOREBOARD&hellip;</div>';
+    fetchCalendar().then(function(cal){
+      var allEvents=[];
+      if(cal&&Array.isArray(cal)){
+        cal.forEach(function(day){
+          if(day.events)day.events.forEach(function(e){allEvents.push(e);});
+        });
+      }
+      if(allEvents.length){
+        saveScoresCache({events:allEvents,ts:Date.now()});
+        document.getElementById('scores-updated').textContent='Updated just now';
+      }
+      renderScoreboard(allEvents);
+    }).catch(function(){
+      if(!cache.events)document.getElementById('scores-body').innerHTML='<div class="events-empty">Could not load scoreboard</div>';
+    });
+  }
+
+  // Poll live stats every 60s
+  function pollLive(){
+    fetchLiveStats().then(renderLiveBanner).catch(function(){});
+  }
+
+  loadScoreboard();
+  pollLive();
+  setInterval(loadScoreboard,30*60*1000);
+  setInterval(pollLive,60000);
+  document.getElementById('scores-refresh').addEventListener('click',function(){
+    localStorage.removeItem(SCORES_CACHE_KEY);
+    selectedSport='all';todayOnly=false;
+    loadScoreboard();pollLive();
+  });
 })();
 
 // ══════════════════════════════════
