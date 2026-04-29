@@ -1101,19 +1101,24 @@ document.getElementById('svc-refresh').addEventListener('click',loadStatus);
   if(!startMuted&&barVisible){
     audio.src=STREAM_URL;
     audio.load();
+    statusEl.textContent='CONNECTING';statusEl.style.color='var(--yellow)';
     var autoP=audio.play();
-    if(autoP&&autoP.catch)autoP.catch(function(){
-      // Browser blocked autoplay — wait for user interaction then retry
-      var resumeOnce=function(){
-        audio.play().catch(function(){});
-        document.removeEventListener('click',resumeOnce);
-        document.removeEventListener('keydown',resumeOnce);
-      };
-      document.addEventListener('click',resumeOnce);
-      document.addEventListener('keydown',resumeOnce);
-    });
-    isPlaying=true;
-    updatePlayUI();
+    if(autoP&&autoP.then){
+      autoP.then(function(){
+        // Autoplay worked — audio 'playing' event will update UI
+      }).catch(function(){
+        // Browser blocked autoplay — show waiting state, retry on first interaction
+        statusEl.textContent='TAP TO START';statusEl.style.color='var(--yellow)';
+        var resumeOnce=function(){
+          audio.play().catch(function(){});
+          document.removeEventListener('click',resumeOnce);
+          document.removeEventListener('keydown',resumeOnce);
+        };
+        document.addEventListener('click',resumeOnce);
+        document.addEventListener('keydown',resumeOnce);
+      });
+    }
+    // Don't set isPlaying=true here — let the 'playing' event handle it
   }
 
   playBtn.addEventListener('click',function(){
